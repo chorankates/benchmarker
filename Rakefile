@@ -6,11 +6,14 @@ $LOAD_PATH << File.dirname(__FILE__)
 require 'benchmarker'
 
 Jeweler::Tasks.new do |gem|
-  gem.name     = 'benchmarker'
-  gem.summary  = 'compare multiple implementations passed in via lambdas'
-  gem.email    = 'conor.code@gmail.com'
-  gem.homepage = 'http://github.com/chorankates/benchmarker'
-  gem.authors  = 'Conor Horan-Kates'
+  gem.name        = 'benchmarker'
+  gem.summary     = 'compare execution time'
+  gem.description = 'given a hash of lambdas, runs and compares the amount of time each implementation takes'
+  gem.email       = 'conor.code@gmail.com'
+  gem.homepage    = 'http://github.com/chorankates/benchmarker'
+  gem.authors     = ['Conor Horan-Kates']
+  gem.licenses    =  'MIT'
+
 end
 Jeweler::RubygemsDotOrgTasks.new
 
