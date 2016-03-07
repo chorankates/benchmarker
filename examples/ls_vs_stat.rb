@@ -18,9 +18,8 @@ tester.benchmark!
 {
   'fastest by type(ls)'    => tester.fastest_by_type(:ls),
   'fastest overall'        => tester.fastest_overall,
-  'slowest_by_type(ls)'    => tester.slowest_by_type(:ls),
-  'slowest_overall'        => tester.slowest_overall,
   'slowest by type(stat)'  => tester.slowest_by_type(:stat),
+  'slowest_overall'        => tester.slowest_overall,
   'is_faster?(:ls, :stat)' => tester.is_faster?(:ls, :stat),
   'is_slower?(:ls, :stat)' => tester.is_slower?(:ls, :stat),
 }.each_pair do |name, result|

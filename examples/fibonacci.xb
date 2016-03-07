@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+# fibonacci.rb - comparing recursive vs. iterative functions
+
+require_relative '../lib/benchmarker'
+require 'test-unit'
+
+def recursive(start, value = 0)
+  if start <= 1
+    return value
+  end
+
+  value += ((start - 1) + (start - 2))
+  recursive(start -= 1, value)
+end
+
+def iterative(target)
+  total = 0
+
+  0.upto(target).each do |e|
+    total += ((e - 1) + (e - 2))
+  end
+
+end
+
+class TestFoo < Test::Unit::TestCase
+  def setup
+    a = recursive(27) # should be 196418
+  end
+
+  def test_foo
+    p 'DBGZ' if nil?
+
+    [
+      0, 1, 2, 3, 4, 5, 6, 7, 8
+    ].each do |i|
+      recursive_result = recursive(i)
+      iterative_result = iterative(i)
+
+
+      p 'DBGZ' if nil?
+      #assert_equal(recursive_result, iterative_result)
+    end
+
+    p 'DBGZ' if nil?
+  end
+
+end
+
+# F0	0
+# F1	1
+# F2	1
+# F3	2
+# F4	3
+# F5	5
+# F6	8
+# F7	13
+# F8	21
+# F9	34
+# F10	55
+# F11	89
