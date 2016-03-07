@@ -4,13 +4,18 @@ require 'benchmark'
 
 class Benchmarker
 
+  VERSION = 0.01
+
   attr_reader :count, :results
 
   def initialize(lambdas, count = 100)
 
     @count   = count
     @results = Hash.new
-    @lambdas = lambdas # TODO input validation
+    @lambdas = lambdas
+
+    @fastest = { :name => :unknown, :measure => 2 ** 10 }
+    @slowest = { :name => :unknown, :measure => 0 }
 
     @lambdas.each_pair do |name, l|
       unless name.class.eql?(Symbol) and l.class.eql?(Proc)
@@ -35,21 +40,73 @@ class Benchmarker
   def inspect
     ## fastest, slowest, median, mode, total per lambda
     ## fastest, slowest for all (do average here too?)
-    calculate
+    {
+      :overall  => calculate_overall,
+      :specific => calculate_per_lambda,
+    }
   end
 
   def to_s
     string = ''
     inspection = self.inspect
     return string unless inspection.nil? or inspection.has_key?(:overall)
-    longest_key = 20 # TODO determine this dynamically
+    longest_key = 15 # TODO determine this dynamically
 
-    inspection[:overall].keys.sort.each do |key|
-      string << sprintf("  %#{longest_key}s => %s%s", key, inspection[:overall][key], "\n")
+    inspection[:specific].keys.each do |i|
+      string << sprintf('%s:%s', i, "\n")
+      inspection[:specific][i].keys.sort.each do |k|
+        string << sprintf("  %#{longest_key}s => %s%s", k, inspection[:specific][i][k], "\n")
+      end
+    end
+
+    string << sprintf('overall:%s', "\n")
+    inspection[:overall].each_pair do |type, measure|
+      string << sprintf("  %#{longest_key}s => %s [%s]%s", type, measure[:name], measure[:measure], "\n")
     end
 
     string
   end
+
+  def fastest_by_type(type)
+    results = @results
+    measures = Array.new
+
+    return nil unless results.has_key?(type)
+    results[type].collect { |r| measures << r.real}
+
+    measures.sort.first
+  end
+
+  def fastest_overall
+    calculate_overall
+    @fastest
+  end
+
+  def slowest_by_type(type)
+    results  = @results
+    measures = Array.new
+
+    return nil unless results.has_key?(type)
+    results[type].collect { |r| measures << r.real }
+
+    measures.sort.last
+  end
+
+  def slowest_overall
+    calculate_overall
+    @slowest
+  end
+
+  def is_faster?(a, b, mode = :total)
+    result = calculate_per_lambda
+    return false unless result.has_key?(a) and result.has_key?(b)
+    result[a][mode] < result[b][mode]
+  end
+
+  def is_slower?(a,b)
+    ! is_faster?(a,b)
+  end
+
 
   private
 
@@ -58,12 +115,12 @@ class Benchmarker
     self.results[name] << measure
   end
 
-  def calculate
+  # TODO come up with way to not recompute unless contents have changed
+  def calculate_per_lambda
     hash = Hash.new
 
     # TODO percentage faster fastest is than slowest
 
-    # determine per lambda results
     @results.each_pair do |name, measures|
       sorted = measures.sort { |a,b| a.real <=> b.real }
 
@@ -75,41 +132,36 @@ class Benchmarker
       # TODO do we want to determine the mode?
       hash[name][:fastest] = sorted.first.real
       hash[name][:slowest] = sorted.last.real
-      hash[name][:mean]    = total / sorted.size
+      hash[name][:mean]    = sprintf('%5f', total / sorted.size)
       hash[name][:median]  = sorted[(sorted.size / 2)].real
-      hash[name][:total]   = total
+      hash[name][:total]   = sprintf('%5f', total)
     end
 
+    hash
+  end
 
-    # determine overall results
-    hash[:overall] = {
-      :fastest => 2 ** 10,
-      :slowest => 0,
-    }
+  def calculate_overall
+
+    hash = calculate_per_lambda
 
     hash.each_pair do |name,results|
-      next if name.eql?(:overall)
 
-      if results[:fastest] < hash[:overall][:fastest]
-        hash[:overall][:fastest] = results[:fastest]
-        hash[:overall][:fastest_name] = name
+      if results[:fastest] < @fastest[:measure]
+        @fastest = { :name => name, :measure => results[:fastest] }
       end
 
-      if results[:slowest] > hash[:overall][:slowest]
-        hash[:overall][:slowest] = results[:slowest]
-        hash[:overall][:slowest_name] = name
+      if results[:slowest] > @slowest[:measure]
+        @slowest = { :name => name, :measure => results[:slowest] }
       end
-
-      # if results[:total] < hash[:overall][:overall_fastest]
-      #   hash[:overall][:overall_fastest] = results[:total]
-      #   hash[:overall][:overall_fastest_name] = name
-      # end
 
     end
 
     #faster_pct = (((hash[:overall][:slowest] - hash[:overall][:fastest]) / hash[:overall][:slowest]) * 100)
 
-    #p 'DBGZ' if nil?
+    {
+      :fastest => @fastest,
+      :slowest => @slowest,
+    }
   end
 
 end
