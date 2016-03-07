@@ -11,7 +11,6 @@ Jeweler::Tasks.new do |gem|
   gem.email    = 'conor.code@gmail.com'
   gem.homepage = 'http://github.com/chorankates/benchmarker'
   gem.authors  = 'Conor Horan-Kates'
-  #gem.version  = Benchmarker.VERSION
 end
 Jeweler::RubygemsDotOrgTasks.new
 

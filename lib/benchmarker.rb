@@ -3,9 +3,7 @@
 require 'benchmark'
 
 class Benchmarker
-
-  VERSION = 0.01
-
+  
   attr_reader :count, :results
 
   def initialize(lambdas, count = 100)
