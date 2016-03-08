@@ -45,16 +45,17 @@ class TestFibonacci < Test::Unit::TestCase
   def test_fibonacci_speed
 
     tester = Benchmarker.new({
-      :iterative  => lambda { iterative(20) },
-      :rescursive => lambda { recursive(20) },
-    })
+      :iterative => lambda { iterative(30) },
+      :recursive => lambda { recursive(30) },
+    }, 25)
 
     tester.benchmark!
+    puts tester
 
-    assert_true(tester.is_faster?(:recursive, :iterative))
-    assert_true(tester.is_slower?(:iterative, :recursive))
-    assert_equal(:recursive, tester.fastest_overall)
-    assert_equal(:iterative, tester.slowest_overall)
+    assert_true(tester.is_faster?(:iterative, :recursive))
+    assert_true(tester.is_slower?(:recursive, :iterative))
+    assert_equal(:iterative, tester.fastest_overall[:name])
+    assert_equal(:recursive, tester.slowest_overall[:name])
 
   end
 
