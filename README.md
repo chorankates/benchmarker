@@ -4,11 +4,12 @@ i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
 
 Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations.
 
+it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rdoc/Benchmark.html)
 
 # examples
 
 ```rb
-tester = Bnchmrlr.new({
+tester = Bnchmrkr.new({
   :count_to_1k   => lambda { 1.upto(1000).each   { |i| i } },
   :count_to_5k   => lambda { 1.upto(5000).each   { |i| i } },
   :count_to_10k  => lambda { 1.upto(10000).each  { |i| i } },
