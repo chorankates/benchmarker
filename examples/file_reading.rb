@@ -1,8 +1,7 @@
 #
 # line by line vs. .read and then split
 
-
-require_relative '../lib/benchmarker'
+require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
 
 class ReadAndSplit
   attr_reader :file

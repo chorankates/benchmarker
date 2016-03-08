@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # ls_vs_stat.rb - comparing `ls <dir>/*` to `stat <dir>/*`
 
-require_relative '../lib/benchmarker'
+require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
 
 dir = File.dirname(__FILE__)
 dir = sprintf('%s/*', ENV['HOME'])

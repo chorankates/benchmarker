@@ -1,7 +1,8 @@
 #!/usr/bin/ruby
 # fibonacci.rb - comparing recursive vs. iterative functions
 
-require_relative '../lib/benchmarker'
+require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
+
 require 'test-unit'
 
 def recursive(n)

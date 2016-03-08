@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 # contrived.rb - methods that intentionally take differing amounts of time
-
-require_relative '../lib/benchmarker'
+require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
 
 tester = Benchmarker.new({
   :count_to_1k   => lambda { 1.upto(1000).each   { |i| i } },
