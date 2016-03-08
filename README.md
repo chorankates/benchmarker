@@ -6,6 +6,33 @@ Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementati
 
 it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rdoc/Benchmark.html)
 
+## usage
+### pre-built gem installation (stable)
+
+[RubyGems](http://rubygems.org/gems/bnchrmr)
+[![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](http://badge.fury.io/rb/bnchmrkr)
+
+```sh
+gem install rouster
+irb
+...
+irb(main):001:0> require 'bnchmrkr'
+=> true
+```
+
+### from-source installation (latest)
+
+```sh
+git clone https://github.com/chorankates/bnchmrkr.git
+cd bnchmrkr
+rake clean build
+gem install pkg/bnchmrkr*.gem
+irb
+...
+irb(main):001:0> require 'bnchmrkr'
+=> true
+```
+
 # examples
 
 ```rb
