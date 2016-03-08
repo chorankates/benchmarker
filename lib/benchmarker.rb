@@ -110,6 +110,16 @@ class Benchmarker
     ! is_faster?(a,b)
   end
 
+  # +a+ {:name => name, :measure => measure}
+  # +b+ {:name => name, :measure => measure}
+  # return Float representing difference in measure, or false, if b is slower than a
+  def faster_by(a, b, percent = true)
+    return false if b[:measure] < a[:measure]
+
+    faster = (b[:measure] - a[:measure]) / b[:measure]
+    percent ? sprintf('%4f%', faster * 100) : faster
+  end
+
   private
 
   def add_measure(name, measure)

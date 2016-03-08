@@ -46,4 +46,14 @@ class TestContrived < Test::Unit::TestCase
     assert_not_equal(forward, reverse)
   end
 
+  def test_faster_by
+
+    fast = @tester.fastest_overall
+    slow = @tester.slowest_overall
+
+    assert_true(@tester.faster_by(fast, slow, false).is_a?(Float))
+    assert_false(@tester.faster_by(slow, fast))
+
+  end
+
 end
