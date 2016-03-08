@@ -165,6 +165,14 @@ class Bnchmrkr
     percent ? sprintf('%4f%', faster * 100) : faster
   end
 
+  def slower_by_type(a, b, percent = true)
+    ! faster_by_type(a, b, percent)
+  end
+
+  def slower_by_result(a, b, percent = true)
+    ! faster_by_result(a, b, percent)
+  end
+
   private
 
   def add_measure(name, measure)
