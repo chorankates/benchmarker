@@ -3,14 +3,14 @@ require 'rake/testtask'
 
 $LOAD_PATH << File.join([File.dirname(__FILE__), 'lib'])
 $LOAD_PATH << File.dirname(__FILE__)
-require 'benchmarker'
+require 'bnchmrkr'
 
 Jeweler::Tasks.new do |gem|
-  gem.name        = 'benchmarker'
+  gem.name        = 'bnchmrkr'
   gem.summary     = 'compare execution time'
   gem.description = 'given a hash of lambdas, runs and compares the amount of time each implementation takes'
   gem.email       = 'conor.code@gmail.com'
-  gem.homepage    = 'http://github.com/chorankates/benchmarker'
+  gem.homepage    = 'http://github.com/chorankates/bnchmrkr'
   gem.authors     = ['Conor Horan-Kates']
   gem.licenses    =  'MIT'
 

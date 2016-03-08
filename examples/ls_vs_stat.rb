@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 # ls_vs_stat.rb - comparing `ls <dir>/*` to `stat <dir>/*`
 
-require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
+require_relative File.expand_path(sprintf('%s/../lib/bnchmrkr', File.dirname(__FILE__)))
 
 dir = File.dirname(__FILE__)
 dir = sprintf('%s/*', ENV['HOME'])
 
-tester = Benchmarker.new({
+tester = Bnchmrkr.new({
     :ls   => lambda { `ls #{dir}` },
     :stat => lambda { `stat #{dir}` },
   },

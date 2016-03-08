@@ -1,7 +1,7 @@
 #
 # line by line vs. .read and then split
 
-require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
+require_relative File.expand_path(sprintf('%s/../lib/bnchmrkr', File.dirname(__FILE__)))
 
 class ReadAndSplit
   attr_reader :file
@@ -65,7 +65,7 @@ files = [
   File.expand_path(sprintf('%s/../resources/li-1Mw.txt', File.dirname(__FILE__))),
 ]
 
-tester = Benchmarker.new({
+tester = Bnchmrkr.new({
   :split => lambda {
     brl = ReadAndSplit.new(files.first)
     brl.read!
@@ -79,7 +79,7 @@ tester = Benchmarker.new({
 tester.benchmark!
 puts tester
 
-tester2 = Benchmarker.new(
+tester2 = Bnchmrkr.new(
   generate_rai_variances(files).merge(
     generate_ras_variances(files)),
   100)

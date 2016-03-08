@@ -2,7 +2,7 @@
 
 require 'benchmark'
 
-class Benchmarker
+class Bnchmrkr
 
   attr_reader :count, :results
 

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 # fibonacci.rb - comparing recursive vs. iterative functions
 
-require_relative File.expand_path(sprintf('%s/../lib/benchmarker', File.dirname(__FILE__)))
+require_relative File.expand_path(sprintf('%s/../lib/bnchmrkr', File.dirname(__FILE__)))
 
 require 'test-unit'
 
@@ -45,7 +45,7 @@ class TestFibonacci < Test::Unit::TestCase
 
   def test_fibonacci_speed
 
-    tester = Benchmarker.new({
+    tester = Bnchmrkr.new({
       :iterative => lambda { iterative(30) },
       :recursive => lambda { recursive(30) },
     }, 25)
