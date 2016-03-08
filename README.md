@@ -2,14 +2,13 @@
 
 i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
 
-Bnchmrkr (Benchmarker) is a
-
+Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations.
 
 
 # examples
 
 ```rb
-tester = Bnchmrmr.new({
+tester = Bnchmrlr.new({
   :count_to_1k   => lambda { 1.upto(1000).each   { |i| i } },
   :count_to_5k   => lambda { 1.upto(5000).each   { |i| i } },
   :count_to_10k  => lambda { 1.upto(10000).each  { |i| i } },
