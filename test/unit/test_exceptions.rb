@@ -14,8 +14,6 @@ class TestExceptions < Test::Unit::TestCase
 
     assert_nothing_raised do
       tester.benchmark!
-      puts tester
-
       assert_true(tester.results.has_key?('divbyzero-failed'.to_sym))
     end
   end
@@ -27,8 +25,6 @@ class TestExceptions < Test::Unit::TestCase
 
     assert_nothing_raised do
       tester.benchmark!
-      puts tester
-
       assert_true(tester.results.has_key?(:foo))
     end
 
