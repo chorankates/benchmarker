@@ -1,10 +1,14 @@
 require 'jeweler'
 require 'rake'
+require 'rake/clean'
 require 'rake/testtask'
 
 $LOAD_PATH << File.join([File.dirname(__FILE__), 'lib'])
 $LOAD_PATH << File.dirname(__FILE__)
 require 'bnchmrkr'
+
+CLEAN.include('bnchmrkr.gemspec')
+CLOBBER.include('pkg/*')
 
 Jeweler::Tasks.new do |gem|
   gem.name        = 'bnchmrkr'
