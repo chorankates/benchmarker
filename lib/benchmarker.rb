@@ -100,14 +100,22 @@ class Benchmarker
     @slowest
   end
 
+  # +a+ {:name => name, :measure => measure}
+  # +b+ {:name => name, :measure => measure}
+  # +mode+ :fastest, :slowest, :mean, :median, :total
+  # return boolean if a is faster than b, false if invalid
   def is_faster?(a, b, mode = :total)
     result = calculate_per_lambda
-    return false unless result.has_key?(a) and result.has_key?(b)
-    result[a][mode] < result[b][mode]
+    return false unless result.has_key?(a[:name]) and result.has_key?(b[:name])
+    result[a[:name]][mode] < result[b[:name]][mode]
   end
 
-  def is_slower?(a,b)
-    ! is_faster?(a,b)
+  # +a+ {:name => name, :measure => measure}
+  # +b+ {:name => name, :measure => measure}
+  # +mode+ :fastest, :slowest, :mean, :median, :total
+  # return boolean if a is faster than b, false if invalid
+  def is_slower?(a, b, mode = :total)
+    ! is_faster?(a, b, mode)
   end
 
   # +a+ {:name => name, :measure => measure}
@@ -130,8 +138,6 @@ class Benchmarker
   # TODO come up with way to not recompute unless contents have changed
   def calculate_per_lambda
     hash = Hash.new
-
-    # TODO percentage faster fastest is than slowest
 
     @results.each_pair do |name, measures|
       sorted = measures.sort { |a,b| a.real <=> b.real }

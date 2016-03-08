@@ -38,12 +38,31 @@ class TestContrived < Test::Unit::TestCase
   end
 
   def test_is_faster?
-    a = @tester.types.first
-    b = @tester.types.last
-    forward = @tester.is_faster?(a, b)
-    reverse = @tester.is_faster?(b, a)
+    fast = @tester.fastest_overall
+    slow = @tester.slowest_overall
+
+    forward = @tester.is_faster?(fast, slow)
+    reverse = @tester.is_faster?(slow, fast)
+    equal   = @tester.is_faster?(fast, fast)
 
     assert_not_equal(forward, reverse)
+    assert_true(forward)
+    assert_false(reverse)
+    assert_false(equal)
+  end
+
+  def test_is_slower?
+    fast = @tester.fastest_overall
+    slow = @tester.slowest_overall
+
+    forward = @tester.is_slower?(slow, fast)
+    reverse = @tester.is_slower?(fast, slow)
+    equal   = @tester.is_slower?(slow, slow)
+
+    assert_not_equal(forward, reverse)
+    assert_true(forward)
+    assert_false(reverse)
+    assert_true(equal) # ugh, this is misleading.. but is_slower? is boolean opposite of is_slower?
   end
 
   def test_faster_by
