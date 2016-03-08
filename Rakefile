@@ -1,4 +1,5 @@
 require 'jeweler'
+require 'rake'
 require 'rake/testtask'
 
 $LOAD_PATH << File.join([File.dirname(__FILE__), 'lib'])
@@ -29,10 +30,17 @@ namespace :test do
     t.verbose = true
   end
 
+  Rake::TestTask.new do |t|
+    t.name = 'examples'
+    t.libs << 'lib'
+    t.test_files = FileList['test/examples/**/*.rb']
+    t.verbose = true
+  end
+
 end
 
 desc 'run all tests'
-task :test => ['test:unit'] do
+task :test => ['test:unit', 'test:examples'] do
 end
 
 desc 'run all examples'
@@ -42,3 +50,8 @@ task :examples do
     puts
   end
 end
+
+# desc 'find code smells'
+# task :reek do
+#   sh 'reek lib/**/*.rb'
+# end
