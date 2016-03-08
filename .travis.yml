@@ -7,4 +7,4 @@ notifications:
   email: false
 
 bundler_args: --without test --jobs 3 --retry 3
-script: bundle exec rake test build
+script: bundle exec rake test reek build

@@ -2,9 +2,13 @@ require 'jeweler'
 require 'rake'
 require 'rake/clean'
 require 'rake/testtask'
+require 'reek/rake/task'
 
-$LOAD_PATH << File.join([File.dirname(__FILE__), 'lib'])
-$LOAD_PATH << File.dirname(__FILE__)
+BASEDIR = File.dirname(__FILE__)
+
+$LOAD_PATH << File.join([BASEDIR, 'lib'])
+$LOAD_PATH << BASEDIR
+
 require 'bnchmrkr'
 
 CLEAN.include('bnchmrkr.gemspec')
@@ -55,7 +59,10 @@ task :examples do
   end
 end
 
-# desc 'find code smells'
-# task :reek do
-#   sh 'reek lib/**/*.rb'
-# end
+Reek::Rake::Task.new do |t|
+  t.config_file   = File.join(BASEDIR, '.reek')
+  t.source_files  = './**/*.rb'
+  t.reek_opts     = '-U'
+  t.fail_on_error = false
+  t.verbose       = true
+end

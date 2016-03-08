@@ -1,0 +1,23 @@
+---
+
+Attribute:
+  enabled: false
+
+# so judgy.. and without context
+BooleanParameter:
+  enabled: false
+
+# more lacking context judgement - when _would_ you be ok with '!' ?
+PrimaDonnaMethod:
+  enabled: false
+
+# i don't name my exceptions specifically. that doesn't make a bad person.
+UncommunicativeVariableName:
+  accept: /^[e|i|k|l|r]$/
+
+# or my comparators in ~sort() functions
+## https://github.com/troessner/reek/issues/886
+UncommunicativeParameterName:
+  accept:
+    - a
+    - b
