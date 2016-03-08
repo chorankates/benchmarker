@@ -3,7 +3,7 @@
 require 'benchmark'
 
 class Benchmarker
-  
+
   attr_reader :count, :results
 
   def initialize(lambdas, count = 100)
@@ -17,11 +17,16 @@ class Benchmarker
 
     @lambdas.each_pair do |name, l|
       unless name.class.eql?(Symbol) and l.class.eql?(Proc)
-        raise StandardError.new(sprintf('expecting[Symbol,Proc], got[%s,%s]', name.class, l.class))
+        raise ArgumentError.new(sprintf('expecting[Symbol,Proc], got[%s,%s]', name.class, l.class))
       end
     end
 
-    #
+    raise ArgumentError.new(sprintf('expecting[Fixnum], got[%s]', count.class)) unless count.class.eql?(Fixnum)
+
+  end
+
+  def types
+    @lambdas.keys
   end
 
   def benchmark!
@@ -105,7 +110,6 @@ class Benchmarker
     ! is_faster?(a,b)
   end
 
-
   private
 
   def add_measure(name, measure)
@@ -153,8 +157,6 @@ class Benchmarker
       end
 
     end
-
-    #faster_pct = (((hash[:overall][:slowest] - hash[:overall][:fastest]) / hash[:overall][:slowest]) * 100)
 
     {
       :fastest => @fastest,
