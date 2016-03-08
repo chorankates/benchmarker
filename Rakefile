@@ -14,6 +14,10 @@ Jeweler::Tasks.new do |gem|
   gem.authors     = ['Conor Horan-Kates']
   gem.licenses    =  'MIT'
 
+  # these files are useful for repo users, but too bulky for gem
+  gem.files.exclude 'resources/*'
+  gem.files.exclude 'examples/*'
+
 end
 Jeweler::RubygemsDotOrgTasks.new
 
