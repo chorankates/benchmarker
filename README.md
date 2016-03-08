@@ -7,10 +7,10 @@ Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementati
 it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rdoc/Benchmark.html)
 
 ## usage
+
 ### pre-built gem installation (stable)
 
-[RubyGems](http://rubygems.org/gems/bnchmrkr)
-[![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](http://badge.fury.io/rb/bnchmrkr)
+[![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](https://rubygems.org/gems/bnchmrkr)
 
 ```sh
 gem install bnchmrkr
@@ -21,6 +21,8 @@ irb(main):001:0> require 'bnchmrkr'
 ```
 
 ### from-source installation (latest)
+
+[![build status](https://travis-ci.org/chorankates/bnchmrkr.svg)](https://travis-ci.org/chorankates/bnchmrkr)
 
 ```sh
 git clone https://github.com/chorankates/bnchmrkr.git
@@ -33,7 +35,7 @@ irb(main):001:0> require 'bnchmrkr'
 => true
 ```
 
-# examples
+## examples
 
 ```rb
 tester = Bnchmrkr.new({
@@ -74,7 +76,7 @@ overall:
           slowest => stat [0.076243]
 ```
 
-# instance methods
+## instance methods
 ```
   benchmark!
   count
