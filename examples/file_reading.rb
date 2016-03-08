@@ -1,60 +1,91 @@
 #
-# line by line vs. .read and then iterate
-# with a varying array of files
+# line by line vs. .read and then split
+
 
 require_relative '../lib/benchmarker'
 
-class ReadByLine
-  attr_reader :files
+class ReadAndSplit
+  attr_reader :file
 
-  def initialize(files)
-    @files = files
+  def initialize(file)
+    @file = file
   end
 
   def read!
-    @files.each do |file|
-      contents = File.read(file).split("\n")
-    end
+    contents = File.read(@file).split("\n")
   end
 end
 
 class ReadAndIterate
-  attr_reader :files
+  attr_reader :file
 
-  def initialize(files)
-    @files = files
+  def initialize(file)
+    @file = file
   end
 
   def read!
-    @files.each do |file|
-      contents = Array.new
-      f = File.new(file)
-      f.each_line do |line|
-        contents << line
-      end
+    contents = Array.new
+    f = File.new(file)
+    f.each_line do |line|
+      contents << line
     end
   end
 
 end
 
-@files = [
-  File.expand_path(sprintf('%s/../resources/li-1kw.txt', File.dirname(__FILE__))),
-  File.expand_path(sprintf('%s/../resources/li-10kw.txt', File.dirname(__FILE__))),
-  File.expand_path(sprintf('%s/../resources/li-50kw.txt', File.dirname(__FILE__))),
+def generate_ras_variances(files)
+  hash = Hash.new
+  name = :split
+  files.each do |file|
+    local_name = sprintf('%s_%s', name.to_s, File.basename(file)).to_sym
+    hash[local_name] = lambda {
+      brl = ReadAndSplit.new(file)
+      brl.read!
+    }
+  end
+  hash
+end
+
+def generate_rai_variances(files)
+  hash = Hash.new
+  name = :iterate
+  files.each do |file|
+    local_name = sprintf('%s_%s', name.to_s, File.basename(file)).to_sym
+    hash[local_name] = lambda {
+      rai = ReadAndIterate.new(file)
+      rai.read!
+    }
+  end
+  hash
+end
+
+
+files = [
   File.expand_path(sprintf('%s/../resources/li-100kw.txt', File.dirname(__FILE__))),
+  File.expand_path(sprintf('%s/../resources/li-500kw.txt', File.dirname(__FILE__))),
+  File.expand_path(sprintf('%s/../resources/li-1Mw.txt', File.dirname(__FILE__))),
 ]
 
 tester = Benchmarker.new({
-  :byline => lambda {
-    brl = ReadByLine.new(@files)
+  :split => lambda {
+    brl = ReadAndSplit.new(files.first)
     brl.read!
   },
   :iterate => lambda {
-    rai = ReadAndIterate.new(@files)
+    rai = ReadAndIterate.new(files.first)
     rai.read!
   }
-})
+}, 500)
 
 tester.benchmark!
 puts tester
+
+tester2 = Benchmarker.new(
+  generate_rai_variances(files).merge(
+    generate_ras_variances(files)),
+  100)
+
+tester2.benchmark!
+puts tester2
+
 
