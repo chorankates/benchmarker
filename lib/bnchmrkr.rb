@@ -36,10 +36,14 @@ class Bnchmrkr
   def benchmark!
     @lambdas.each_pair do |name, l|
       1.upto(@count).each do |round|
-        measure = Benchmark.measure {
-          l.call
-        }
-        add_measure(name, measure)
+        begin
+          measure = Benchmark.measure {
+            l.call
+          }
+          add_measure(name, measure)
+        rescue => e
+          add_measure(sprintf('%s-failed', name).to_sym, Benchmark.measure {})
+        end
       end
     end
 
@@ -56,7 +60,8 @@ class Bnchmrkr
     string     = String.new
     inspection = self.inspect
     return string unless inspection.nil? or inspection.has_key?(:overall)
-    longest_key = 15 # TODO determine this dynamically
+
+    longest_key = inspection[:specific].keys.each { |i| i.length }.max.length
 
     inspection[:specific].keys.each do |i|
       string << sprintf('%s:%s', i, "\n")
@@ -65,9 +70,17 @@ class Bnchmrkr
       end
     end
 
+    longest_key = inspection[:overall].keys.each { |i| i.length }.max.length
+
     string << sprintf('overall:%s', "\n")
     inspection[:overall].each_pair do |type, measure|
-      string << sprintf("  %#{longest_key}s => %s [%s]%s", type, measure[:name], measure[:measure], "\n")
+      string << sprintf("  %#{longest_key}s => %s [%s]%s%s",
+                        type,
+                        measure[:name],
+                        measure[:measure],
+                        measure.has_key?(:faster_by) ? sprintf(' [faster by %s]', measure[:faster_by]) : '',
+                        "\n"
+      )
     end
 
     string
@@ -109,14 +122,14 @@ class Bnchmrkr
     @slowest
   end
 
-  # +a+ {:name => name, :measure => measure}
-  # +b+ {:name => name, :measure => measure}
+  # +a+ Symbol that represents a known lambda
+  # +b+ Symbol that represents a known lambda
   # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
   def is_faster?(a, b, mode = :total)
     result = calculate_per_lambda
-    return false unless result.has_key?(a[:name]) and result.has_key?(b[:name])
-    result[a[:name]][mode] < result[b[:name]][mode]
+    return false unless result.has_key?(a) and result.has_key?(b)
+    result[a][mode] < result[b][mode]
   end
 
   # +a+ {:name => name, :measure => measure}
@@ -129,11 +142,26 @@ class Bnchmrkr
 
   # +a+ {:name => name, :measure => measure}
   # +b+ {:name => name, :measure => measure}
-  # return Float representing difference in measure, or false, if b is slower than a
-  def faster_by(a, b, percent = true)
+  # +percent+ Boolean representing percent (String) or Float difference
+  # return Float representing difference in measures, or false, if b is slower than a
+  def faster_by_result(a, b, percent = true)
     return false if b[:measure] < a[:measure]
 
     faster = (b[:measure] - a[:measure]) / b[:measure]
+    percent ? sprintf('%4f%', faster * 100) : faster
+  end
+
+  # +a+ Symbol representing name of known lambda type
+  # +b+ Symbol representing name of known lambda type
+  # +percent+ Boolean representing percent (String) or Float difference
+  # return Float representing difference in measures, or false, if b is slower than a
+  def faster_by_type(a, b, percent = true)
+    fastest_a = fastest_by_type(a)
+    fastest_b = fastest_by_type(b)
+
+    return false if fastest_b < fastest_a
+
+    faster = (fastest_b - fastest_a) / fastest_b
     percent ? sprintf('%4f%', faster * 100) : faster
   end
 
@@ -181,6 +209,7 @@ class Bnchmrkr
       end
     end
 
+    @fastest[:faster_by] = self.faster_by_result(@fastest, @slowest)
     { :fastest => @fastest, :slowest => @slowest }
   end
 

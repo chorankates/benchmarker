@@ -38,8 +38,8 @@ class TestContrived < Test::Unit::TestCase
   end
 
   def test_is_faster?
-    fast = @tester.fastest_overall
-    slow = @tester.slowest_overall
+    fast = @tester.fastest_overall[:name]
+    slow = @tester.slowest_overall[:name]
 
     forward = @tester.is_faster?(fast, slow)
     reverse = @tester.is_faster?(slow, fast)
@@ -52,8 +52,8 @@ class TestContrived < Test::Unit::TestCase
   end
 
   def test_is_slower?
-    fast = @tester.fastest_overall
-    slow = @tester.slowest_overall
+    fast = @tester.fastest_overall[:name]
+    slow = @tester.slowest_overall[:name]
 
     forward = @tester.is_slower?(slow, fast)
     reverse = @tester.is_slower?(fast, slow)
@@ -65,13 +65,24 @@ class TestContrived < Test::Unit::TestCase
     assert_true(equal) # ugh, this is misleading.. but is_slower? is boolean opposite of is_slower?
   end
 
-  def test_faster_by
-
+  def test_faster_by_result
     fast = @tester.fastest_overall
     slow = @tester.slowest_overall
 
-    assert_true(@tester.faster_by(fast, slow, false).is_a?(Float))
-    assert_false(@tester.faster_by(slow, fast))
+    assert_not_nil(@tester.faster_by_result(fast, slow, true))
+    assert_match(/\d+\.\d+%/, @tester.faster_by_result(fast, slow, true))
+    assert_true(@tester.faster_by_result(fast, slow, false).is_a?(Float))
+    assert_false(@tester.faster_by_result(slow, fast))
+  end
+
+  def test_faster_by_type
+    fastest = @tester.fastest_overall[:name]
+    slowest = @tester.slowest_overall[:name]
+
+    assert_not_nil(@tester.faster_by_type(fastest, slowest, true))
+    assert_match(/\d+\.\d+%/, @tester.faster_by_type(fastest, slowest, true))
+    assert_true(@tester.faster_by_type(fastest, slowest, false).is_a?(Float))
+    assert_false(@tester.faster_by_type(slowest, fastest))
 
   end
 
