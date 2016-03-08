@@ -13,6 +13,9 @@ ControlParameter:
 DuplicateMethodCall:
   enabled: false
 
+NestedIterators:
+  max_allowed_nesting: 3
+
 # more lacking context judgement - when _would_ you be ok with '!' ?
 PrimaDonnaMethod:
   enabled: false
@@ -23,7 +26,7 @@ TooManyStatements:
 
 # i don't name my exceptions specifically. that doesn't make a bad person.
 UncommunicativeVariableName:
-  accept: /^[a|b|e|i|k|l|r]$/
+  accept: /^[a|b|e|f|i|j|k|l|m|r]$/
 
 # or my comparators in ~sort() functions
 ## https://github.com/troessner/reek/issues/886

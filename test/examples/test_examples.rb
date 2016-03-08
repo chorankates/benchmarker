@@ -1,7 +1,8 @@
 require_relative File.expand_path(sprintf('%s/../../lib/bnchmrkr', File.dirname(__FILE__)))
 require 'test-unit'
 
-class TestContrived < Test::Unit::TestCase
+# run all examples, ensure non-0 exit code and non-nil output
+class TestExamples < Test::Unit::TestCase
 
   def setup;  end
 

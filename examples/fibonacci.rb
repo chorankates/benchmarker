@@ -31,6 +31,7 @@ def iterative(target)
   hash[target]
 end
 
+# tests to ensure equality and speed of different functions
 class TestFibonacci < Test::Unit::TestCase
 
   def test_fibonacci_equality

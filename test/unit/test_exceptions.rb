@@ -1,6 +1,7 @@
 require_relative File.expand_path(sprintf('%s/../../lib/bnchmrkr', File.dirname(__FILE__)))
 require 'test-unit'
 
+# test that exceptions thrown in the middle of a #benchmark! run will behave in expected ways
 class TestExceptions < Test::Unit::TestCase
 
   def setup; end

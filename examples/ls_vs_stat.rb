@@ -6,10 +6,11 @@ require_relative File.expand_path(sprintf('%s/../lib/bnchmrkr', File.dirname(__F
 dir = sprintf('%s/*', ENV['HOME'])
 
 tester = Bnchmrkr.new({
-    :ls   => lambda { `ls #{dir}` },
-    :stat => lambda { `stat #{dir}` },
+    :ls    => lambda { `ls #{dir}` },
+    :stat  => lambda { `stat #{dir}` },
+    :stat2 => lambda { `stat -f '%A %N %Sg %Su' #{dir}` },
   },
-  10,
+  100,
 )
 
 tester.benchmark!

@@ -3,6 +3,7 @@
 
 require_relative File.expand_path(sprintf('%s/../lib/bnchmrkr', File.dirname(__FILE__)))
 
+# exposes #read!, which slurps the file in and splits on spaces
 class ReadAndSplit
   attr_reader :file
 
@@ -15,6 +16,7 @@ class ReadAndSplit
   end
 end
 
+# exposes #read!, which reads each line at a time into an array
 class ReadAndIterate
   attr_reader :file
 
@@ -63,6 +65,7 @@ files = [
   File.expand_path(sprintf('%s/../resources/li-100kw.txt', File.dirname(__FILE__))),
   File.expand_path(sprintf('%s/../resources/li-500kw.txt', File.dirname(__FILE__))),
   File.expand_path(sprintf('%s/../resources/li-1Mw.txt', File.dirname(__FILE__))),
+  __FILE__,
 ]
 
 tester = Bnchmrkr.new({

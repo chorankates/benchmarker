@@ -1,11 +1,11 @@
 require_relative File.expand_path(sprintf('%s/../../lib/bnchmrkr', File.dirname(__FILE__)))
 require 'test-unit'
 
+
+# test valid/invalid instantiations
 class TestInitialize < Test::Unit::TestCase
 
-  def setup
-
-  end
+  def setup; end
 
   def test_valid
 

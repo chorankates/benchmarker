@@ -2,6 +2,7 @@
 
 require 'benchmark'
 
+# Bnchmrkr is a tool to help Benchmark.measure {} and compare different method implementations
 class Bnchmrkr
 
   attr_reader :count, :results
