@@ -2,14 +2,14 @@
 
 i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
 
-Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations.
+Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations
 
 it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rdoc/Benchmark.html)
 
 ## usage
 ### pre-built gem installation (stable)
 
-[RubyGems](http://rubygems.org/gems/bnchrmr)
+[RubyGems](http://rubygems.org/gems/bnchmrkr)
 [![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](http://badge.fury.io/rb/bnchmrkr)
 
 ```sh
