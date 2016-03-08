@@ -13,7 +13,7 @@ it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rd
 [![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](http://badge.fury.io/rb/bnchmrkr)
 
 ```sh
-gem install rouster
+gem install bnchmrkr
 irb
 ...
 irb(main):001:0> require 'bnchmrkr'
