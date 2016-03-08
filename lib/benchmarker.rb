@@ -8,12 +8,14 @@ class Benchmarker
 
   def initialize(lambdas, count = 100)
 
-    @count   = count
-    @results = Hash.new
-    @lambdas = lambdas
+    @count    = count
+    @results  = Hash.new
+    @lambdas  = lambdas
 
-    @fastest = { :name => :unknown, :measure => 2 ** 10 }
+    @fastest = { :name => :unknown, :measure => 2 ** 10 } # TODO really need to find a better max int
     @slowest = { :name => :unknown, :measure => 0 }
+
+    @cache = Hash.new
 
     @lambdas.each_pair do |name, l|
       unless name.class.eql?(Symbol) and l.class.eql?(Proc)
@@ -25,10 +27,12 @@ class Benchmarker
 
   end
 
+  # return list of named lambdas known
   def types
     @lambdas.keys
   end
 
+  # 10 lines to actually do the work..
   def benchmark!
     @lambdas.each_pair do |name, l|
       1.upto(@count).each do |round|
@@ -38,19 +42,18 @@ class Benchmarker
         add_measure(name, measure)
       end
     end
+
   end
 
+  ## :specific => fastest, slowest, mean, median, total per lambda
+  ## :overall  => fastest, slowest for all
   def inspect
-    ## fastest, slowest, median, mode, total per lambda
-    ## fastest, slowest for all (do average here too?)
-    {
-      :overall  => calculate_overall,
-      :specific => calculate_per_lambda,
-    }
+    { :overall  => calculate_overall, :specific => calculate_per_lambda }
   end
 
+  # overly intricate output formatting of overall and specific results
   def to_s
-    string = ''
+    string     = String.new
     inspection = self.inspect
     return string unless inspection.nil? or inspection.has_key?(:overall)
     longest_key = 15 # TODO determine this dynamically
@@ -70,6 +73,8 @@ class Benchmarker
     string
   end
 
+  # +type+ name of a lambda that is known
+  # find and return the fastest execution per lambda of +type+
   def fastest_by_type(type)
     results = @results
     measures = Array.new
@@ -80,11 +85,14 @@ class Benchmarker
     measures.sort.first
   end
 
+  # find and return the fastest overall execution (regardless of lambda type)
   def fastest_overall
     calculate_overall
     @fastest
   end
 
+  # +type+ name of a lambda that is known
+  # find and return the slowest execution per lambda of +type+
   def slowest_by_type(type)
     results  = @results
     measures = Array.new
@@ -95,6 +103,7 @@ class Benchmarker
     measures.sort.last
   end
 
+  # find and return the slowest overall execution (regardless of lambda type)
   def slowest_overall
     calculate_overall
     @slowest
@@ -135,9 +144,11 @@ class Benchmarker
     self.results[name] << measure
   end
 
-  # TODO come up with way to not recompute unless contents have changed
+  # from existing results, generate some statistics per lambda type
   def calculate_per_lambda
     hash = Hash.new
+
+    # TODO come up with way to not recompute unless contents have changed
 
     @results.each_pair do |name, measures|
       sorted = measures.sort { |a,b| a.real <=> b.real }
@@ -158,12 +169,9 @@ class Benchmarker
     hash
   end
 
+  # update fastest/slowest, return in a named Hash
   def calculate_overall
-
-    hash = calculate_per_lambda
-
-    hash.each_pair do |name,results|
-
+    calculate_per_lambda.each_pair do |name,results|
       if results[:fastest] < @fastest[:measure]
         @fastest = { :name => name, :measure => results[:fastest] }
       end
@@ -171,13 +179,9 @@ class Benchmarker
       if results[:slowest] > @slowest[:measure]
         @slowest = { :name => name, :measure => results[:slowest] }
       end
-
     end
 
-    {
-      :fastest => @fastest,
-      :slowest => @slowest,
-    }
+    { :fastest => @fastest, :slowest => @slowest }
   end
 
 end
