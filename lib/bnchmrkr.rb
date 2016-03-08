@@ -61,7 +61,7 @@ class Bnchmrkr
     inspection = self.inspect
     return string unless inspection.nil? or inspection.has_key?(:overall)
 
-    longest_key = inspection[:specific].keys.each { |i| i.length }.max.length
+    longest_key = inspection[:specific].keys.each { |i| i.length }.max.length + 5
 
     inspection[:specific].keys.each do |i|
       string << sprintf('%s:%s', i, "\n")
@@ -69,8 +69,6 @@ class Bnchmrkr
         string << sprintf("  %#{longest_key}s => %s%s", k, inspection[:specific][i][k], "\n")
       end
     end
-
-    longest_key = inspection[:overall].keys.each { |i| i.length }.max.length
 
     string << sprintf('overall:%s', "\n")
     inspection[:overall].each_pair do |type, measure|

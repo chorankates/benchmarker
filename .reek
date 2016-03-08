@@ -7,13 +7,23 @@ Attribute:
 BooleanParameter:
   enabled: false
 
+ControlParameter:
+  enabled: false
+
+DuplicateMethodCall:
+  enabled: false
+
 # more lacking context judgement - when _would_ you be ok with '!' ?
 PrimaDonnaMethod:
   enabled: false
 
+# this feels a bit arbitrary.. maybe would make more sense if was an average
+TooManyStatements:
+  max_statements: 15
+
 # i don't name my exceptions specifically. that doesn't make a bad person.
 UncommunicativeVariableName:
-  accept: /^[e|i|k|l|r]$/
+  accept: /^[a|b|e|i|k|l|r]$/
 
 # or my comparators in ~sort() functions
 ## https://github.com/troessner/reek/issues/886
