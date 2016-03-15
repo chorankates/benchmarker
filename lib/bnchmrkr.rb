@@ -146,7 +146,7 @@ class Bnchmrkr
   def faster_by_result(a, b, percent = true)
     return false if b[:measure] < a[:measure]
 
-    faster = (b[:measure] - a[:measure]) / b[:measure]
+    faster = (b[:measure] - a[:measure]) / a[:measure]
     percent ? sprintf('%4f%', faster * 100) : faster
   end
 
@@ -160,7 +160,7 @@ class Bnchmrkr
 
     return false if fastest_b < fastest_a
 
-    faster = (fastest_b - fastest_a) / fastest_b
+    faster = (fastest_b - fastest_a) / fastest_a
     percent ? sprintf('%4f%', faster * 100) : faster
   end
 
@@ -191,9 +191,8 @@ class Bnchmrkr
       hash[name] = Hash.new
 
       total = 0
+      # TODO add the mode
       measures.collect {|m| total += m.real }
-
-      # TODO do we want to determine the mode?
       hash[name][:fastest] = sorted.first.real
       hash[name][:slowest] = sorted.last.real
       hash[name][:mean]    = sprintf('%5f', total / sorted.size)
