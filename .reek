@@ -24,7 +24,7 @@ PrimaDonnaMethod:
 TooManyStatements:
   max_statements: 15
 
-# i don't name my exceptions specifically. that doesn't make a bad person.
+# i don't name my exceptions specifically. that doesn't make me a bad person.
 UncommunicativeVariableName:
   accept: /^[a|b|e|f|i|j|k|l|m|r]$/
 
