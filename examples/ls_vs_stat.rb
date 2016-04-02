@@ -8,7 +8,10 @@ dir = sprintf('%s/*', ENV['HOME'])
 tester = Bnchmrkr.new({
     :ls    => lambda { `ls #{dir}` },
     :stat  => lambda { `stat #{dir}` },
-    :stat2 => lambda { `stat -f '%A %N %Sg %Su' #{dir}` },
+    :stat2 => lambda {
+      format_flag = RUBY_PLATFORM.match(/darwin/i) ? '-f' : '--format'
+      `stat #{format_flag} '%A %N %Sg %Su' #{dir}`
+    },
   },
   100,
 )
