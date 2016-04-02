@@ -51,6 +51,7 @@ def generate_rai_variances(files)
   hash = Hash.new
   name = :iterate
   files.each do |file|
+    next unless File.file?(file)
     local_name = sprintf('%s_%s', name.to_s, File.basename(file)).to_sym
     hash[local_name] = lambda {
       rai = ReadAndIterate.new(file)
@@ -68,19 +69,21 @@ files = [
   __FILE__,
 ]
 
-tester = Bnchmrkr.new({
-  :split => lambda {
-    brl = ReadAndSplit.new(files.first)
-    brl.read!
-  },
-  :iterate => lambda {
-    rai = ReadAndIterate.new(files.first)
-    rai.read!
-  }
-}, 500)
+if File.file?(files.first)
+  tester = Bnchmrkr.new({
+    :split => lambda {
+      brl = ReadAndSplit.new(files.first)
+      brl.read!
+    },
+    :iterate => lambda {
+      rai = ReadAndIterate.new(files.first)
+      rai.read!
+    }
+  }, 500)
 
-tester.benchmark!
-puts tester
+  tester.benchmark!
+  puts tester
+end
 
 tester2 = Bnchmrkr.new(
   generate_rai_variances(files).merge(
