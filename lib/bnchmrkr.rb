@@ -179,25 +179,39 @@ class Bnchmrkr
     self.results[name] << measure
   end
 
+  # +mode_precision+ Fixnum indicating number of digits to consider during mode calculation, default to 0, which will use all signal
   # from existing results, generate some statistics per lambda type
-  def calculate_per_lambda
+  def calculate_per_lambda(mode_precision = 0)
     hash = Hash.new
 
-    # TODO come up with way to not recompute unless contents have changed
+    # TODO come up with way to not recompute unless contents have changed -- https://github.com/chorankates/bnchmrkr/issues/3
 
     @results.each_pair do |name, measures|
-      sorted = measures.sort { |a,b| a.real <=> b.real }
-
-      hash[name] = Hash.new
-
+      hash[name]     = Hash.new
+      frequency_hash = Hash.new(0)
+      mode_candidate = { :frequency => 1, :operand => nil }
       total = 0
-      # TODO add the mode
+
+      sorted = measures.sort { |a,b| a.real <=> b.real }
+      measures.each do |measure|
+        operand = mode_precision.equal?(0) ? measure.real : measure.real.round(mode_precision)
+        frequency_hash[operand] += 1
+
+        # i hate maths
+        if frequency_hash[operand] > mode_candidate[:frequency] and frequency_hash[operand] > 1
+          mode_candidate[:frequency] = frequency_hash[operand]
+          mode_candidate[:operand]   = operand
+        end
+      end
+
       measures.collect {|m| total += m.real }
       hash[name][:fastest] = sorted.first.real
       hash[name][:slowest] = sorted.last.real
-      hash[name][:mean]    = sprintf('%5f', total / sorted.size)
+      hash[name][:mean]    = sprintf('%5f', total / sorted.size).to_f
       hash[name][:median]  = sorted[(sorted.size / 2)].real
-      hash[name][:total]   = sprintf('%5f', total)
+      # TODO need to handle the rare case that we have multiple modes -- https://github.com/chorankates/bnchmrkr/issues/4
+      hash[name][:mode]    = mode_candidate[:operand] # collect key name with highest value
+      hash[name][:total]   = sprintf('%5f', total).to_f
     end
 
     hash
