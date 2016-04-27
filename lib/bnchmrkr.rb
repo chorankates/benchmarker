@@ -198,11 +198,11 @@ class Bnchmrkr
       end
 
       max_frequency = frequency_hash.values.max
-      mode_candidate = frequency_hash.select{ |_operand, frequency| frequency == max_frequency }.keys
+      mode_candidate = frequency_hash.select{ |_operand, frequency| frequency.equal?(max_frequency) }.keys
       if max_frequency.equal?(1)
         mode = nil
       else
-        mode = mode_candidate.size > 1 ? mode_candidate : mode_candidate[0]
+        mode = mode_candidate.size > 1 ? mode_candidate : mode_candidate.first
       end
 
       measures.collect {|m| total += m.real }
