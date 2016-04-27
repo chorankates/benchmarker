@@ -189,19 +189,20 @@ class Bnchmrkr
     @results.each_pair do |name, measures|
       hash[name]     = Hash.new
       frequency_hash = Hash.new(0)
-      mode_candidate = { :frequency => 1, :operand => nil }
       total = 0
 
       sorted = measures.sort { |a,b| a.real <=> b.real }
       measures.each do |measure|
         operand = mode_precision.equal?(0) ? measure.real : measure.real.round(mode_precision)
         frequency_hash[operand] += 1
+      end
 
-        # i hate maths
-        if frequency_hash[operand] > mode_candidate[:frequency] and frequency_hash[operand] > 1
-          mode_candidate[:frequency] = frequency_hash[operand]
-          mode_candidate[:operand]   = operand
-        end
+      max_frequency = frequency_hash.values.max
+      mode_candidate = frequency_hash.select{ |_operand, frequency| frequency.equal?(max_frequency) }.keys
+      if max_frequency.equal?(1)
+        mode = nil
+      else
+        mode = mode_candidate.size > 1 ? mode_candidate : mode_candidate.first
       end
 
       measures.collect {|m| total += m.real }
@@ -209,8 +210,7 @@ class Bnchmrkr
       hash[name][:slowest] = sorted.last.real
       hash[name][:mean]    = sprintf('%5f', total / sorted.size).to_f
       hash[name][:median]  = sorted[(sorted.size / 2)].real
-      # TODO need to handle the rare case that we have multiple modes -- https://github.com/chorankates/bnchmrkr/issues/4
-      hash[name][:mode]    = mode_candidate[:operand] # collect key name with highest value
+      hash[name][:mode]    = mode
       hash[name][:total]   = sprintf('%5f', total).to_f
     end
 
