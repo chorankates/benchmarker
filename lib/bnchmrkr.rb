@@ -2,117 +2,183 @@
 
 require 'benchmark'
 
+class Bnchmrkr; end # empty class to keep Ruby and my ordering preferences happy
+
+# Bnchmrkr::Mark represents individual lambda runs within a Bnchmrkr run
+class Bnchmrkr::Mark
+  include Enumerable
+
+  attr_reader :computed, :lambda, :name, :mode_precision
+  attr_reader :fastest, :slowest, :mean, :median, :mode, :total
+
+  def initialize(name, lambda, mode_precision = 0)
+    @name      = name
+    @lambda    = lambda # TODO this name is going to cause problems
+    @measures  = Array.new
+    @computed  = false
+
+    @mode_precision = mode_precision
+  end
+
+  # +measure+ Benchmark.measure{} result
+  def add_measure(measure)
+    @measures << measure
+  end
+
+  # allows Array-like behavior on the Array of measurements contained in a Bnchmrkr::Mark
+  def each(&block)
+    @measures.each(&block)
+  end
+
+  # generate (and TODO cache) results of computations
+  def compute
+    frequency_hash = Hash.new(0)
+    total          = 0
+
+    sorted = @measures.sort { |a,b| a.real <=> b.real }
+
+    @measures.each do |measure|
+      operand = @mode_precision.equal?(0) ? measure.real : measure.real.round(@mode_precision)
+      frequency_hash[operand] += 1
+    end
+
+    max_frequency  = frequency_hash.values.max
+    mode_candidate = frequency_hash.select{ |_operand, frequency| frequency.equal?(max_frequency) }.keys
+
+    if max_frequency.equal?(1)
+      mode = nil
+    else
+      mode = mode_candidate.size > 1 ? mode_candidate : mode_candidate.first
+    end
+
+    sorted.collect { |r| total += r.real }
+    @fastest = sorted.first
+    @slowest = sorted.last
+    @mean    = sprintf('%5f', total / sorted.size).to_f
+    @median  = sorted[(sorted.size / 2)]
+    @mode    = mode
+    @total   = sprintf('%5f', total).to_f
+
+    @computed = true
+  end
+
+  # a semi-fancy and somewhat fragile inspect method
+  ## try to compute if we haven't been, ensuring we always return a hash
+  def inspect
+    begin
+      self.compute unless @computed
+      {
+        :fastest => @fastest.real,
+        :slowest => @slowest.real,
+        :mean    => @mean,
+        :median  => @median,
+        :mode    => @mode,
+        :total   => @total,
+      }
+    rescue => e
+      { }
+    end
+  end
+
+end
+
 # Bnchmrkr is a tool to help Benchmark.measure {} and compare different method implementations
 class Bnchmrkr
 
-  attr_reader :count, :results
+  attr_reader :executions, :marks, :fastest, :slowest
 
-  def initialize(lambdas, count = 100)
+  def initialize(lambdas, executions = 100)
+    @executions  = executions
+    @marks       = Hash.new
 
-    @count    = count
-    @results  = Hash.new
-    @lambdas  = lambdas
+    @fastest = nil
+    @slowest = nil
 
-    @fastest = { :name => :unknown, :measure => 2 ** 10 } # TODO really need to find a better max int
-    @slowest = { :name => :unknown, :measure => 0 }
-
-    @cache = Hash.new
-
-    @lambdas.each_pair do |name, l|
+    lambdas.each_pair do |name, l|
       unless name.class.eql?(Symbol) and l.class.eql?(Proc)
         raise ArgumentError.new(sprintf('expecting[Symbol,Proc], got[%s,%s]', name.class, l.class))
       end
+
+      @marks[name] = Bnchmrkr::Mark.new(name, l)
     end
 
-    raise ArgumentError.new(sprintf('expecting[Fixnum], got[%s]', count.class)) unless count.class.eql?(Fixnum)
+    raise ArgumentError.new(sprintf('expecting[Fixnum], got[%s]', executions.class)) unless executions.class.eql?(Fixnum)
 
   end
 
-  # return list of named lambdas known
+  # return list of named Bnchmrkr::Marks
   def types
-    @lambdas.keys
+    @marks.keys
   end
 
   # 10 lines to actually do the work..
   def benchmark!
-    @lambdas.each_pair do |name, l|
-      1.upto(@count).each do |round|
-        begin
-          measure = Benchmark.measure {
-            l.call
-          }
-          add_measure(name, measure)
-        rescue => e
-          add_measure(sprintf('%s-failed', name).to_sym, Benchmark.measure {})
-        end
+    @marks.each_pair do |_name, mark|
+      1.upto(@executions).each do |_execution|
+        measure = Benchmark.measure { mark.lambda.call }
+        mark.add_measure(measure)
       end
+
+      mark.compute # this is a safer place to do it than by computing on each measure, but still should consider putting this behind a flag
     end
 
+    calculate_overall
   end
 
-  ## :specific => fastest, slowest, mean, median, total per lambda
-  ## :overall  => fastest, slowest for all
   def inspect
-    { :overall  => calculate_overall, :specific => calculate_per_lambda }
+    return {:foo => { :bar => 'baz'}} if @fastest.nil?
+    {
+      :fastest => {
+        :name    => @fastest.name,
+        :fastest => @fastest.fastest.to_s.chomp,
+        :by      => self.faster_by_result(@fastest.fastest, @slowest.slowest),
+      },
+      :slowest => {
+        :name    => @slowest.name,
+        :slowest => @slowest.fastest.to_s.chomp,
+      },
+      :meta => {
+        :marks      => @marks.keys,
+        :executions => @executions,
+      },
+    }
   end
 
   # overly intricate output formatting of overall and specific results
   def to_s
     string     = String.new
     inspection = self.inspect
-    return string unless inspection.nil? or inspection.has_key?(:overall)
 
-    longest_key = inspection[:specific].keys.each { |i| i.length }.max.length + 5
+    longest_key = inspection.keys.each { |i| i.length }.max.length + 5
 
-    inspection[:specific].keys.each do |i|
+    inspection.keys.each do |i|
       string << sprintf('%s:%s', i, "\n")
-      inspection[:specific][i].keys.sort.each do |k|
-        string << sprintf("  %#{longest_key}s => %s%s", k, inspection[:specific][i][k], "\n")
+      inspection[i].keys.each do |k|
+        string << sprintf("  %#{longest_key}s => %s%s", k, inspection[i][k], "\n")
       end
-    end
-
-    string << sprintf('overall:%s', "\n")
-    inspection[:overall].each_pair do |type, measure|
-      string << sprintf("  %#{longest_key}s => %s [%s]%s%s",
-                        type,
-                        measure[:name],
-                        measure[:measure],
-                        measure.has_key?(:faster_by) ? sprintf(' [faster by %s]', measure[:faster_by]) : '',
-                        "\n"
-      )
     end
 
     string
   end
 
   # +type+ name of a lambda that is known
-  # find and return the fastest execution per lambda of +type+
+  # find and return the fastest Bnchrmrkr::Mark per lambda of +type+
   def fastest_by_type(type)
-    results = @results
-    measures = Array.new
+    return nil unless @marks.has_key?(type)
+    @marks[type].fastest
+  end
 
-    return nil unless results.has_key?(type)
-    results[type].collect { |r| measures << r.real}
-
-    measures.sort.first
+  # +type+ name of a lambda that is known
+  # find and return the slowest Bnchrmrkr::Mark per lambda of +type+
+  def slowest_by_type(type)
+    return nil unless @marks.has_key?(type)
+    @marks[type].slowest
   end
 
   # find and return the fastest overall execution (regardless of lambda type)
   def fastest_overall
     calculate_overall
     @fastest
-  end
-
-  # +type+ name of a lambda that is known
-  # find and return the slowest execution per lambda of +type+
-  def slowest_by_type(type)
-    results  = @results
-    measures = Array.new
-
-    return nil unless results.has_key?(type)
-    results[type].collect { |r| measures << r.real }
-
-    measures.sort.last
   end
 
   # find and return the slowest overall execution (regardless of lambda type)
@@ -126,27 +192,30 @@ class Bnchmrkr
   # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
   def is_faster?(a, b, mode = :total)
-    result = calculate_per_lambda
-    return false unless result.has_key?(a) and result.has_key?(b)
-    result[a][mode] < result[b][mode]
+    return false unless @marks.has_key?(a) and @marks.has_key?(b)
+    # TODO not sure that we're doing the right thing here.. the fastest fast run should always be faster than the slowest slow run.. but should we be comparing fastest fast with slowest fast?
+    @marks[a].fastest.__send__(mode) < @marks[b].fastest.__send__(mode)
   end
 
-  # +a+ {:name => name, :measure => measure}
-  # +b+ {:name => name, :measure => measure}
+  # +a+ Bnchmrkr::Mark
+  # +b+ Bnchmrlr::Mark
   # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
   def is_slower?(a, b, mode = :total)
     ! is_faster?(a, b, mode)
   end
 
-  # +a+ {:name => name, :measure => measure}
-  # +b+ {:name => name, :measure => measure}
+  # +a+ Bnchmrkr::Mark
+  # +b+ Bnchmrkr::Mark
   # +percent+ Boolean representing percent (String) or Float difference
   # return Float representing difference in measures, or false, if b is slower than a
-  def faster_by_result(a, b, percent = true)
-    return false if b[:measure] < a[:measure]
+  def faster_by_result(a, b, percent = true, mode = :real)
+    measure_a = a.__send__(mode)
+    measure_b = b.__send__(mode)
 
-    faster = (b[:measure] - a[:measure]) / a[:measure]
+    return false if measure_b < measure_a
+
+    faster = (measure_b - measure_a) / measure_a
     percent ? sprintf('%4f%', faster * 100) : faster
   end
 
@@ -154,9 +223,9 @@ class Bnchmrkr
   # +b+ Symbol representing name of known lambda type
   # +percent+ Boolean representing percent (String) or Float difference
   # return Float representing difference in measures, or false, if b is slower than a
-  def faster_by_type(a, b, percent = true)
-    fastest_a = fastest_by_type(a)
-    fastest_b = fastest_by_type(b)
+  def faster_by_type(a, b, percent = true, mode = :real)
+    fastest_a = fastest_by_type(a).__send__(mode)
+    fastest_b = fastest_by_type(b).__send__(mode)
 
     return false if fastest_b < fastest_a
 
@@ -174,63 +243,27 @@ class Bnchmrkr
 
   private
 
-  def add_measure(name, measure)
-    self.results[name] = Array.new unless self.results.has_key?(name)
-    self.results[name] << measure
-  end
-
-  # +mode_precision+ Fixnum indicating number of digits to consider during mode calculation, default to 0, which will use all signal
-  # from existing results, generate some statistics per lambda type
-  def calculate_per_lambda(mode_precision = 0)
-    hash = Hash.new
-
-    # TODO come up with way to not recompute unless contents have changed -- https://github.com/chorankates/bnchmrkr/issues/3
-
-    @results.each_pair do |name, measures|
-      hash[name]     = Hash.new
-      frequency_hash = Hash.new(0)
-      total = 0
-
-      sorted = measures.sort { |a,b| a.real <=> b.real }
-      measures.each do |measure|
-        operand = mode_precision.equal?(0) ? measure.real : measure.real.round(mode_precision)
-        frequency_hash[operand] += 1
-      end
-
-      max_frequency = frequency_hash.values.max
-      mode_candidate = frequency_hash.select{ |_operand, frequency| frequency.equal?(max_frequency) }.keys
-      if max_frequency.equal?(1)
-        mode = nil
-      else
-        mode = mode_candidate.size > 1 ? mode_candidate : mode_candidate.first
-      end
-
-      measures.collect {|m| total += m.real }
-      hash[name][:fastest] = sorted.first.real
-      hash[name][:slowest] = sorted.last.real
-      hash[name][:mean]    = sprintf('%5f', total / sorted.size).to_f
-      hash[name][:median]  = sorted[(sorted.size / 2)].real
-      hash[name][:mode]    = mode
-      hash[name][:total]   = sprintf('%5f', total).to_f
-    end
-
-    hash
-  end
-
   # update fastest/slowest, return in a named Hash
-  def calculate_overall
-    calculate_per_lambda.each_pair do |name,results|
-      if results[:fastest] < @fastest[:measure]
-        @fastest = { :name => name, :measure => results[:fastest] }
+  def calculate_overall(mode = :real)
+
+    @marks.each_pair do |_name, mark|
+      if @fastest.nil? or mark.fastest.__send__(mode) < @fastest.fastest.__send__(mode)
+        @fastest = mark
       end
 
-      if results[:slowest] > @slowest[:measure]
-        @slowest = { :name => name, :measure => results[:slowest] }
+      if @slowest.nil? or mark.slowest.__send__(mode) > @slowest.slowest.__send__(mode)
+        @slowest = mark
       end
+
+
     end
 
-    @fastest[:faster_by] = self.faster_by_result(@fastest, @slowest)
-    { :fastest => @fastest, :slowest => @slowest }
+    p = {
+      :fastest => @fastest,
+      :slowest => @slowest,
+      :faster_by => self.faster_by_result(@fastest.fastest, @slowest.slowest)
+    }
+    return p
   end
 
 end
