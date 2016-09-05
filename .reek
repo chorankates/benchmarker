@@ -10,11 +10,26 @@ BooleanParameter:
 ControlParameter:
   enabled: false
 
+DataClump:
+  min_clump_size: 4
+
 DuplicateMethodCall:
   enabled: false
 
+# this is not a real thing
+FeatureEnvy:
+  enabled: false
+
+# this should have understanding of non-required parameters
+LongParameterList:
+  max_params: 5
+
 NestedIterators:
   max_allowed_nesting: 3
+
+# you don't know my life
+NilCheck:
+  enabled: false
 
 # more lacking context judgement - when _would_ you be ok with '!' ?
 PrimaDonnaMethod:
@@ -22,7 +37,15 @@ PrimaDonnaMethod:
 
 # this feels a bit arbitrary.. maybe would make more sense if was an average
 TooManyStatements:
-  max_statements: 15
+  max_statements: 30
+
+# see above
+TooManyInstanceVariables:
+  max_instance_variables: 20
+
+# see above
+TooManyMethods:
+  max_methods: 20
 
 # i don't name my exceptions specifically. that doesn't make me a bad person.
 UncommunicativeVariableName:
