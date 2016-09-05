@@ -85,17 +85,19 @@ class Bnchmrkr
   end
 
   # +type+ name of a lambda that is known
-  # find and return the fastest Bnchrmrkr::Mark per lambda of +type+
-  def fastest_by_type(type)
+  # +mode+ method to use on the Bnchmrkr::Mark object ot compare (:real, :cstime, :cutime, :stime, :utime, :total)
+  # find and return the fastest Bnchrmrkr::Mark runtime per lambda of +type+
+  def fastest_by_type(type, mode = :real)
     return nil unless @marks.has_key?(type)
-    @marks[type].fastest
+    @marks[type].fastest.__send__(mode)
   end
 
   # +type+ name of a lambda that is known
-  # find and return the slowest Bnchrmrkr::Mark per lambda of +type+
-  def slowest_by_type(type)
+  # +mode+ method to use on the Bnchmrkr::Mark object ot compare (:real, :cstime, :cutime, :stime, :utime, :total)
+  # find and return the slowest Bnchrmrkr::Mark runtime per lambda of +type+
+  def slowest_by_type(type, mode = :real)
     return nil unless @marks.has_key?(type)
-    @marks[type].slowest
+    @marks[type].slowest.__send__(mode)
   end
 
   # find and return the fastest overall execution (regardless of lambda type)
@@ -124,7 +126,7 @@ class Bnchmrkr
   # +b+ Bnchmrlr::Mark
   # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
-  def is_slower?(a, b, mode = :total)
+  def is_slower?(a, b, mode = :real)
     ! is_faster?(a, b, mode)
   end
 
