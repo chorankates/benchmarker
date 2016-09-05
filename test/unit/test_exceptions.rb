@@ -6,17 +6,21 @@ class TestExceptions < Test::Unit::TestCase
 
   def setup; end
 
-  def test_lambdas_will_raise
+  def test_lambdas_will_raise # but we will catch them
+    symbol = :divbyzero
+
     tester = Bnchmrkr.new({
-      :divbyzero => lambda {
+      symbol => lambda {
         10 / 0
       },
     })
 
-    assert_nothing_raised do
+    e = assert_raise do
       tester.benchmark!
-      assert_true(tester.results.has_key?('divbyzero-failed'.to_sym))
     end
+
+    assert_true(tester.marks.has_key?(symbol))
+    assert_equal(ZeroDivisionError, e.class)
   end
 
   def test_lambdas_wont_raise_anyway
@@ -26,7 +30,7 @@ class TestExceptions < Test::Unit::TestCase
 
     assert_nothing_raised do
       tester.benchmark!
-      assert_true(tester.results.has_key?(:foo))
+      assert_true(tester.marks.has_key?(:foo))
     end
 
   end

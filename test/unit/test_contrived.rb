@@ -17,44 +17,44 @@ class TestContrived < Test::Unit::TestCase
   end
 
   def test_fastest
-    assert_equal(:count_to_1k, @tester.fastest_overall[:name])
-    assert_true(@tester.fastest_overall[:measure] < @tester.slowest_overall[:measure])
+    assert_equal(:count_to_1k, @tester.fastest_overall.name)
+    assert_true(@tester.fastest_overall.fastest.real < @tester.slowest_overall.slowest.real)
   end
 
   def test_slowest
     slowest_overall = @tester.slowest_overall
     fastest_overall = @tester.fastest_overall
 
-    assert_equal(:count_to_100k, slowest_overall[:name])
-    assert_true(slowest_overall[:measure] > fastest_overall[:measure])
+    assert_equal(:count_to_100k, slowest_overall.name)
+    assert_true(slowest_overall.slowest.real > fastest_overall.fastest.real)
   end
 
   def test_speed_by_type
     @tester.types.each do |type|
-      slowest = @tester.slowest_by_type(type)
-      fastest = @tester.fastest_by_type(type)
+      slowest = @tester.slowest_by_type(type).real
+      fastest = @tester.fastest_by_type(type).real
 
       assert_true(slowest > fastest)
     end
   end
 
   def test_is_faster?
-    fast = @tester.fastest_overall[:name]
-    slow = @tester.slowest_overall[:name]
+    fast = @tester.fastest_overall.name
+    slow = @tester.slowest_overall.name
 
     forward = @tester.is_faster?(fast, slow)
     reverse = @tester.is_faster?(slow, fast)
     equal   = @tester.is_faster?(fast, fast)
 
-    assert_not_equal(forward, reverse)
+    assert_not_equal(forward, reverse) # TODO this is currently failing.. think it is related to .slowest vs .fastest
     assert_true(forward)
     assert_false(reverse)
     assert_false(equal)
   end
 
   def test_is_slower?
-    fast = @tester.fastest_overall[:name]
-    slow = @tester.slowest_overall[:name]
+    fast = @tester.fastest_overall.name
+    slow = @tester.slowest_overall.name
 
     forward = @tester.is_slower?(slow, fast)
     reverse = @tester.is_slower?(fast, slow)
@@ -67,8 +67,8 @@ class TestContrived < Test::Unit::TestCase
   end
 
   def test_faster_by_result
-    fast = @tester.fastest_overall
-    slow = @tester.slowest_overall
+    fast = @tester.fastest_overall.fastest
+    slow = @tester.slowest_overall.slowest
 
     assert_not_nil(@tester.faster_by_result(fast, slow, true))
     assert_match(/\d+\.\d+%/, @tester.faster_by_result(fast, slow, true))
@@ -77,14 +77,13 @@ class TestContrived < Test::Unit::TestCase
   end
 
   def test_faster_by_type
-    fastest = @tester.fastest_overall[:name]
-    slowest = @tester.slowest_overall[:name]
+    fastest = @tester.fastest_overall.name
+    slowest = @tester.slowest_overall.name
 
     assert_not_nil(@tester.faster_by_type(fastest, slowest, true))
     assert_match(/\d+\.\d+%/, @tester.faster_by_type(fastest, slowest, true))
     assert_true(@tester.faster_by_type(fastest, slowest, false).is_a?(Float))
     assert_false(@tester.faster_by_type(slowest, fastest))
-
   end
 
 end
