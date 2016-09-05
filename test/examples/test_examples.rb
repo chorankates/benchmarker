@@ -12,8 +12,10 @@ class TestExamples < Test::Unit::TestCase
     @files.each do |file|
       raw = `ruby #{file}`
 
-      assert_true($?.success?)
-      assert_not_nil(raw)
+      generic_failure_message = sprintf('[%s] returned [%s]: [%s]', File.basename(file), $?, raw)
+
+      assert_true($?.success?, generic_failure_message)
+      assert_not_nil(raw, generic_failure_message)
     end
   end
 
