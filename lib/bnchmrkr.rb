@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
-# Bnchmrkr is a tool to help Benchmark.measure {} and compare different method implementations
 
 $LOAD_PATH << sprintf('%s/../lib', File.dirname(__FILE__))
 require 'bnchmrkr/mark'
 
 require 'benchmark'
 
+# Bnchmrkr is a tool to help Benchmark.measure {} and compare different method implementations
 class Bnchmrkr
 
   attr_reader :executions, :marks, :fastest, :slowest
@@ -172,23 +172,24 @@ class Bnchmrkr
   def calculate_overall(mode = :real)
 
     @marks.each_pair do |_name, mark|
-      if @fastest.nil? or mark.fastest.__send__(mode) < @fastest.fastest.__send__(mode)
+      if @fastest.nil? or mark.fastest.__send__(mode) < @fastest.__send__(mode)
         @fastest = mark
       end
 
-      if @slowest.nil? or mark.slowest.__send__(mode) > @slowest.slowest.__send__(mode)
+      if @slowest.nil? or mark.slowest.__send__(mode) > @slowest.__send__(mode)
         @slowest = mark
       end
 
 
     end
 
-    p = {
-      :fastest => @fastest,
-      :slowest => @slowest,
-      :faster_by => self.faster_by_result(@fastest.fastest, @slowest.slowest)
+    {
+      :fastest      => @fastest.fastest.__send__(mode),
+      :fastest_name => @fastest.name,
+      :slowest      => @slowest.slowest.__send__(mode),
+      :slowest_name => @slowest.name,
+      :faster_by    => self.faster_by_result(@fastest.fastest, @slowest.slowest)
     }
-    return p
   end
 
 end

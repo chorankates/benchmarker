@@ -65,12 +65,12 @@ class Bnchmrkr::Mark
     begin
       self.compute unless @computed
       {
-          :fastest => @fastest.real,
-          :slowest => @slowest.real,
-          :mean    => @mean,
-          :median  => @median,
-          :mode    => @mode,
-          :total   => @total,
+        :fastest => @fastest.real,
+        :slowest => @slowest.real,
+        :mean    => @mean,
+        :median  => @median,
+        :mode    => @mode,
+        :total   => @total,
       }
     rescue => e
       { }
