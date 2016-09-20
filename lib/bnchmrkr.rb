@@ -172,14 +172,13 @@ class Bnchmrkr
   def calculate_overall(mode = :real)
 
     @marks.each_pair do |_name, mark|
-      if @fastest.nil? or mark.fastest.__send__(mode) < @fastest.__send__(mode)
+      if @fastest.nil? or mark.fastest.__send__(mode) < @fastest.fastest.__send__(mode)
         @fastest = mark
       end
 
-      if @slowest.nil? or mark.slowest.__send__(mode) > @slowest.__send__(mode)
+      if @slowest.nil? or mark.slowest.__send__(mode) > @slowest.slowest.__send__(mode)
         @slowest = mark
       end
-
 
     end
 
