@@ -34,7 +34,7 @@ class Bnchmrkr
     @marks.keys
   end
 
-  # 10 lines to actually do the work..
+  # < 10 lines to actually do the work..
   def benchmark!
     @marks.each_pair do |_name, mark|
       1.upto(@executions).each do |_execution|
