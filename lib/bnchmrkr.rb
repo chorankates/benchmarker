@@ -123,7 +123,7 @@ class Bnchmrkr
   end
 
   # +a+ Bnchmrkr::Mark
-  # +b+ Bnchmrlr::Mark
+  # +b+ Bnchmrkr::Mark
   # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
   def is_slower?(a, b, mode = :real)
