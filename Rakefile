@@ -66,3 +66,8 @@ Reek::Rake::Task.new do |t|
   t.fail_on_error = false
   t.verbose       = true
 end
+
+desc 'install the gem'
+task :install do
+  sh 'gem install log4r-sequel'
+end
