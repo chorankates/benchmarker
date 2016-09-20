@@ -49,7 +49,6 @@ class Bnchmrkr
   end
 
   def inspect
-    return {:foo => { :bar => 'baz'}} if @fastest.nil?
     {
       :fastest => {
         :name    => @fastest.name,
