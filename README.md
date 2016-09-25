@@ -2,7 +2,7 @@
 
 [![build status](https://travis-ci.org/chorankates/bnchmrkr.svg)](https://travis-ci.org/chorankates/bnchmrkr) [![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](https://rubygems.org/gems/bnchmrkr)
 
-Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations
+Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations in Ruby
 
 it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rdoc/Benchmark.html)
 
@@ -14,6 +14,7 @@ i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
 - [examples](#examples)
   - [code](#code)
   - [output](#output)
+  - [converting from < 0.1.1](#upgrading)
 - [methods](#methods)
   - [Bnchmrkr](#bnchmrkr)
   - [Bnchmrkr::Mark](#bnchmrkrmark)
@@ -45,7 +46,7 @@ irb(main):001:0> require 'bnchmrkr'
 
 ## examples
 
-### code 
+### code
 
 ```rb
 tester = Bnchmrkr.new({
@@ -86,6 +87,26 @@ stat:
 overall:
           fastest => ls [0.005704]
           slowest => stat [0.076243]
+```
+
+### upgrading
+
+`Bnchmrkr` follows semantic versioning, which allowed a breaking change from versions `0.1.1` to `0.2.0`
+
+`0.2.0` significantly improves the API and implementation for `Bnchmrkr`, and while upgrading will require some client side changes, they shouldn't be too onerous:
+
+for the most part, you should be able to update the Hash lookup key with a method call of the same name,
+
+#### < 0.1.1
+```rb
+assert_equal(:iterative, tester.fastest_overall[:name])
+assert_equal(:recursive, tester.slowest_overall[:name])
+```
+
+#### >= 0.2.0
+```rb
+assert_equal(:iterative, tester.fastest_overall.name)
+assert_equal(:recursive, tester.slowest_overall.name)
 ```
 
 ## methods
