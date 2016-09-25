@@ -8,6 +8,8 @@ require 'benchmark'
 # Bnchmrkr is a tool to help Benchmark.measure {} and compare different method implementations
 class Bnchmrkr
 
+  UNCOMPUTED = :uncomputed
+
   attr_reader :executions, :marks, :fastest, :slowest
 
   def initialize(lambdas, executions = 100)
@@ -15,8 +17,8 @@ class Bnchmrkr
     @marks       = Hash.new
 
     # TODO need to cache these computations and allow reseting similar to how Bnchmrkr::Mark works
-    @fastest = :uncomputed
-    @slowest = :uncomputed
+    @fastest = UNCOMPUTED
+    @slowest = UNCOMPUTED
 
     lambdas.each_pair do |name, l|
       unless name.class.eql?(Symbol) and l.class.eql?(Proc)
@@ -88,7 +90,7 @@ class Bnchmrkr
   # +mode+ method to use on the Bnchmrkr::Mark object ot compare (:real, :cstime, :cutime, :stime, :utime, :total)
   # find and return the fastest Bnchrmrkr::Mark runtime per lambda of +type+
   def fastest_by_type(type, mode = :real)
-    return nil unless @marks.has_key?(type)
+    return UNCOMPUTED unless @marks.has_key?(type)
     @marks[type].fastest.__send__(mode)
   end
 
@@ -96,7 +98,7 @@ class Bnchmrkr
   # +mode+ method to use on the Bnchmrkr::Mark object ot compare (:real, :cstime, :cutime, :stime, :utime, :total)
   # find and return the slowest Bnchrmrkr::Mark runtime per lambda of +type+
   def slowest_by_type(type, mode = :real)
-    return nil unless @marks.has_key?(type)
+    return UNCOMPUTED unless @marks.has_key?(type)
     @marks[type].slowest.__send__(mode)
   end
 
