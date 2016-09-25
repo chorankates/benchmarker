@@ -8,6 +8,16 @@ it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rd
 
 i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
 
+- [usage](#usage)
+  - [pre-built gem installation (stable)](#pre-built-gem-installation-stable)
+  - [from-source installation (latest)](#from-source-installation-latest)
+- [examples](#examples)
+  - [code](#code)
+  - [output](#output)
+- [methods](#methods)
+  - [Bnchmrkr](#bnchmrkr)
+  - [Bnchmrkr::Mark](#bnchmrkrmark)
+
 ## usage
 
 ### pre-built gem installation (stable)
@@ -35,6 +45,8 @@ irb(main):001:0> require 'bnchmrkr'
 
 ## examples
 
+### code 
+
 ```rb
 tester = Bnchmrkr.new({
   :count_to_1k   => lambda { 1.upto(1000).each   { |i| i } },
@@ -48,6 +60,8 @@ tester.benchmark!
 
 puts tester
 ```
+
+### output
 
 ```
 $ ruby examples/ls_vs_stat.rb
