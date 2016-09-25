@@ -12,14 +12,16 @@ class Bnchmrkr::Mark
     @name      = name
     @lambda    = lambda # TODO this name is going to cause problems
     @measures  = Array.new
-    @computed  = false
 
     @mode_precision = mode_precision
+
+    reset_computations # initialize to known values
   end
 
   # +measure+ Benchmark.measure{} result
   def add_measure(measure)
     @measures << measure
+    reset_computations if @computed # as soon as a measure is added, previous computations are invalid
   end
 
   # allows Array-like behavior on the Array of measurements contained in a Bnchmrkr::Mark
@@ -27,7 +29,6 @@ class Bnchmrkr::Mark
     @measures.each(&block)
   end
 
-  # generate (and TODO cache) results of computations
   def compute
     frequency_hash = Hash.new(0)
     total          = 0
@@ -65,6 +66,7 @@ class Bnchmrkr::Mark
     begin
       self.compute unless @computed
       {
+        :name    => @name,
         :fastest => @fastest.real,
         :slowest => @slowest.real,
         :mean    => @mean,
@@ -73,8 +75,21 @@ class Bnchmrkr::Mark
         :total   => @total,
       }
     rescue => e
-      { }
+      { :name => @name, :computed => @computed }
     end
+  end
+
+  private
+
+  # reset internal computed values, used when a new measure is added
+  def reset_computations
+    @computed = false
+    @fastest  = :uncomputed
+    @slowest  = :uncomputed
+    @mean     = :uncomputed
+    @median   = :uncomputed
+    @mode     = :uncomputed
+    @total    = :uncomputed
   end
 
 end

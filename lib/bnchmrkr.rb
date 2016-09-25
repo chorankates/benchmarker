@@ -14,8 +14,9 @@ class Bnchmrkr
     @executions  = executions
     @marks       = Hash.new
 
-    @fastest = nil
-    @slowest = nil
+    # TODO need to cache these computations and allow reseting similar to how Bnchmrkr::Mark works
+    @fastest = :uncomputed
+    @slowest = :uncomputed
 
     lambdas.each_pair do |name, l|
       unless name.class.eql?(Symbol) and l.class.eql?(Proc)
