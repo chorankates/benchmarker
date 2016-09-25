@@ -1,16 +1,16 @@
 # bnchmrkr
 
-i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
+[![build status](https://travis-ci.org/chorankates/bnchmrkr.svg)](https://travis-ci.org/chorankates/bnchmrkr) [![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](https://rubygems.org/gems/bnchmrkr)
 
 Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations
 
 it is driven by [Benchmark](http://ruby-doc.org/stdlib-2.0.0/libdoc/benchmark/rdoc/Benchmark.html)
 
+i hate the name too, [but..](https://github.com/chorankates/bnchmrkr/issues/1)
+
 ## usage
 
 ### pre-built gem installation (stable)
-
-[![Gem Version](https://badge.fury.io/rb/bnchmrkr.png)](https://rubygems.org/gems/bnchmrkr)
 
 ```sh
 gem install bnchmrkr
@@ -21,8 +21,6 @@ irb(main):001:0> require 'bnchmrkr'
 ```
 
 ### from-source installation (latest)
-
-[![build status](https://travis-ci.org/chorankates/bnchmrkr.svg)](https://travis-ci.org/chorankates/bnchmrkr)
 
 ```sh
 git clone https://github.com/chorankates/bnchmrkr.git
@@ -76,16 +74,40 @@ overall:
           slowest => stat [0.076243]
 ```
 
-## instance methods
+## methods
+
+### `Bnchmrkr`
+```rb
+attr_reader :executions, :marks, :fastest, :slowest
+...
+def initialize(lambdas, executions = 100)
+def types
+def benchmark!
+def inspect
+def to_s
+def fastest_by_type(type, mode = :real)
+def slowest_by_type(type, mode = :real)
+def fastest_overall
+def slowest_overall
+def is_faster?(a, b, mode = :real)
+def is_slower?(a, b, mode = :real)
+def faster_by_result(a, b, percent = true, mode = :real)
+def faster_by_type(a, b, percent = true, mode = :real)
+def slower_by_type(a, b, percent = true)
+def slower_by_result(a, b, percent = true)
+def calculate_overall(mode = :real)
 ```
-  benchmark!
-  count
-  faster_by
-  fastest_by_type
-  fastest_overall
-  is_faster?
-  is_slower?
-  results
-  slowest_by_type
-  slowest_overall
+
+### `Bnchmrkr::Mark`
+```rb
+attr_reader :computed, :lambda, :name, :mode_precision
+attr_reader :fastest, :slowest, :mean, :median, :mode, :total
+...
+def initialize(name, lambda, mode_precision = 0)
+def add_measure(measure)
+def each(&block)
+def compute
+def inspect
+def reset_computations
+```
 ```
