@@ -56,8 +56,8 @@ class TestFibonacci < Test::Unit::TestCase
 
     assert_true(tester.is_faster?(:iterative, :recursive))
     assert_true(tester.is_slower?(:recursive, :iterative))
-    assert_equal(:iterative, tester.fastest_overall[:name])
-    assert_equal(:recursive, tester.slowest_overall[:name])
+    assert_equal(:iterative, tester.fastest_overall.name)
+    assert_equal(:recursive, tester.slowest_overall.name)
 
   end
 

@@ -19,6 +19,19 @@ class TestInitialize < Test::Unit::TestCase
 
   end
 
+  # TODO this is really testing Bnchmrkr::Mark objects
+  def test_initial_values
+
+    bnchmrkr = Bnchmrkr.new({:foo => lambda {}})
+
+    bnchmrkr.marks.each_pair do |name, m|
+      [ :fastest, :slowest, :mean, :median, :mode, :total ].each do |a|
+        assert_equal(:uncomputed, m.__send__(a), sprintf('failed[%s] for[%s]', a, name))
+      end
+    end
+
+  end
+
   def test_invalid
 
     # not a proc
@@ -48,8 +61,6 @@ class TestInitialize < Test::Unit::TestCase
     assert_raise ArgumentError do
       Bnchmrkr.new({:foo => :bar}, 1.1)
     end
-
-
 
   end
 

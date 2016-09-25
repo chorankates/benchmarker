@@ -61,8 +61,13 @@ end
 
 Reek::Rake::Task.new do |t|
   t.config_file   = File.join(BASEDIR, '.reek')
-  t.source_files  = './**/*.rb'
+  t.source_files  = FileList.new('lib/**/*.rb', 'test/**/*.rb')
   t.reek_opts     = '--no-wiki-links'
   t.fail_on_error = false
   t.verbose       = true
+end
+
+desc 'install the gem'
+task :install do
+  sh 'gem install log4r-sequel'
 end
