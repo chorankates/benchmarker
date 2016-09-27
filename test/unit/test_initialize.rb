@@ -30,6 +30,8 @@ class TestInitialize < Test::Unit::TestCase
       end
     end
 
+    assert_equal(100, bnchmrkr.executions) # TODO externalize this, currently just a default in the function header
+
   end
 
   def test_invalid

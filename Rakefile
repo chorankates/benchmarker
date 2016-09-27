@@ -45,10 +45,17 @@ namespace :test do
     t.verbose = true
   end
 
+  Rake::TestTask.new do |t|
+    t.name = 'functional'
+    t.libs << 'lib'
+    t.test_files = FileList['test/functional/**/*.rb']
+    t.verbose = true
+  end
+
 end
 
 desc 'run all tests'
-task :test => ['test:unit', 'test:examples'] do
+task :test => ['test:unit', 'test:examples', 'test:functional'] do
 end
 
 desc 'run all examples'
