@@ -3,6 +3,7 @@ ruby '2.0.0'
 source 'https://rubygems.org'
 
 group :development do
+  gem 'codeclimate-test-reporter', group: :test, require: nil
   gem 'rake', '~> 10.5.0', '>= 10.5.0'
   gem 'jeweler', '~> 2.0.1', '>= 2.0.1'
   gem 'reek', '~> 3.11', '>= 3.11'
