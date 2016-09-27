@@ -23,9 +23,8 @@ class TestFunctionalContrived < Test::Unit::TestCase
 
     assert(@bnchmrkr.is_faster?(:count_to_500, :count_to_2k))
     assert(@bnchmrkr.is_slower?(:count_to_2k, :count_to_500))
-
-    p 'DBGZ' if nil?
   end
 
 
 end
+
