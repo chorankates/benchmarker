@@ -1,22 +1,22 @@
 #!/usr/bin/ruby
+## Bnchmrkr helps Benchmark.measure {} and compare different method implementations
 
 $LOAD_PATH << sprintf('%s/../lib', File.dirname(__FILE__))
 require 'bnchmrkr/mark'
 
 require 'benchmark'
 
-# Bnchmrkr is a tool to help Benchmark.measure {} and compare different method implementations
 class Bnchmrkr
 
+  DEFAULT_EXECUTION_COUNT = 100
   UNCOMPUTED = :uncomputed
 
   attr_reader :executions, :marks, :fastest, :slowest
 
-  def initialize(lambdas, executions = 100)
+  def initialize(lambdas, executions = DEFAULT_EXECUTION_COUNT)
     @executions  = executions
     @marks       = Hash.new
 
-    # TODO need to cache these computations and allow reseting similar to how Bnchmrkr::Mark works
     @fastest = UNCOMPUTED
     @slowest = UNCOMPUTED
 
@@ -52,21 +52,32 @@ class Bnchmrkr
   end
 
   def inspect
-    {
-      :fastest => {
-        :name    => @fastest.name,
-        :fastest => @fastest.fastest.to_s.chomp,
-        :by      => self.faster_by_result(@fastest.fastest, @slowest.slowest),
-      },
-      :slowest => {
-        :name    => @slowest.name,
-        :slowest => @slowest.fastest.to_s.chomp,
-      },
-      :meta => {
-        :marks      => @marks.keys,
-        :executions => @executions,
-      },
+    hash = Hash.new
+
+    unless @fastest.nil? or @fastest.eql?(UNCOMPUTED)
+      hash = {
+        :fastest => {
+          :name    => @fastest.name,
+          :fastest => @fastest.fastest.to_s.chomp,
+          :by      => self.faster_by_result(@fastest.fastest, @slowest.slowest),
+        },
+        :slowest => {
+          :name    => @slowest.name,
+          :slowest => @slowest.fastest.to_s.chomp,
+        },
+        :meta => {
+          :marks      => @marks.keys,
+          :executions => @executions,
+        },
+      }
+    end
+
+    hash[:meta] = {
+      :marks      => @marks.keys,
+      :executions => @executions,
     }
+
+    hash
   end
 
   # overly intricate output formatting of overall and specific results
@@ -173,6 +184,8 @@ class Bnchmrkr
   # update fastest/slowest, return in a named Hash
   def calculate_overall(mode = :real)
 
+    reset_computation
+
     @marks.each_pair do |_name, mark|
       if @fastest.eql?(:uncomputed) or mark.fastest.__send__(mode) < @fastest.fastest.__send__(mode)
         @fastest = mark
@@ -191,6 +204,12 @@ class Bnchmrkr
       :slowest_name => @slowest.name,
       :faster_by    => self.faster_by_result(@fastest.fastest, @slowest.slowest)
     }
+  end
+
+  # helper method to reset internal state - but not sure we really need to be saving this in the first place..
+  def reset_computation
+    @fastest = UNCOMPUTED
+    @slowest = UNCOMPUTED
   end
 
 end
