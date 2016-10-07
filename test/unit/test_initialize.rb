@@ -17,8 +17,7 @@ class TestInitialize < Test::Unit::TestCase
 
   end
 
-  # TODO this is really testing Bnchmrkr::Mark objects
-  def test_initial_values
+  def test_initial_mark_values
 
     bnchmrkr = Bnchmrkr.new({:foo => lambda {}})
 
@@ -28,7 +27,7 @@ class TestInitialize < Test::Unit::TestCase
       end
     end
 
-    assert_equal(100, bnchmrkr.executions) # TODO externalize this, currently just a default in the function header
+    assert_equal(Bnchmrkr::DEFAULT_EXECUTION_COUNT, bnchmrkr.executions)
 
   end
 
