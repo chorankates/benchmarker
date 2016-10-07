@@ -29,6 +29,10 @@ irb
 ...
 irb(main):001:0> require 'bnchmrkr'
 => true
+irb(main):002 > t = Bnchmrkr.new({ :count_to_1k  => lambda { 1.upto(10_000) }, :count_to_10k => lambda { 1.upto(1000) } })
+ => {:meta=>{:marks=>[:count_to_1k, :count_to_10k], :executions=>100}} 
+irb(main):003 > t.benchmark!
+ => {:fastest=>2.0e-06, :fastest_name=>:count_to_10k, :slowest=>6.7e-05, :slowest_name=>:count_to_1k, :faster_by=>"3250.000000%"} 
 ```
 
 ### from-source installation (latest)
@@ -144,5 +148,4 @@ def each(&block)
 def compute
 def inspect
 def reset_computations
-```
 ```
