@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
-## Bnchmrkr helps Benchmark.measure {} and compare different method implementations
 
 $LOAD_PATH << sprintf('%s/../lib', File.dirname(__FILE__))
 require 'bnchmrkr/mark'
 
 require 'benchmark'
 
+# Bnchmrkr helps Benchmark.measure {} and compare different method implementations
 class Bnchmrkr
 
   DEFAULT_EXECUTION_COUNT = 100

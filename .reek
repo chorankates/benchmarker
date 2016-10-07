@@ -57,3 +57,7 @@ UncommunicativeParameterName:
   accept:
     - a
     - b
+
+# got dinged for using class variables.. how else would you use self.startup?
+exclude_paths:
+  - test/
