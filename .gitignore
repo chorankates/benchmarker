@@ -6,3 +6,6 @@
 # artifacts
 pkg/*
 bnchmrkr.gemspec
+
+# generated
+.rakeTasks
