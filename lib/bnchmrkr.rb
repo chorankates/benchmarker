@@ -11,11 +11,25 @@ class Bnchmrkr
   DEFAULT_EXECUTION_COUNT = 100
   UNCOMPUTED = :uncomputed
 
-  attr_reader :executions, :marks, :fastest, :slowest
+  attr_reader :executions, :benchmark_method, :precision, :mark_precision, :mark_mode_precision
+  attr_reader :marks, :fastest, :slowest
 
-  def initialize(lambdas, executions = DEFAULT_EXECUTION_COUNT)
+  def initialize(lambdas,
+                 executions = DEFAULT_EXECUTION_COUNT,
+                 precision = 5,
+                 benchmark_method = :real,
+                 mark_precision = 5,
+                 mark_mode_precision = 0
+  )
+
     @executions  = executions
     @marks       = Hash.new
+    @precision   = precision
+
+    # paying a high price to keep the interface clean
+    @benchmark_method    = benchmark_method
+    @mark_precision      = mark_precision
+    @mark_mode_precision = mark_mode_precision
 
     @fastest = UNCOMPUTED
     @slowest = UNCOMPUTED
@@ -25,7 +39,11 @@ class Bnchmrkr
         raise ArgumentError.new(sprintf('expecting[Symbol,Proc], got[%s,%s]', name.class, l.class))
       end
 
-      @marks[name] = Bnchmrkr::Mark.new(name, l)
+      @marks[name] = Bnchmrkr::Mark.new(
+        name,
+        l,
+        {:precision => @mark_precision, :mode_precision => @mark_mode_precision}
+      )
     end
 
     raise ArgumentError.new(sprintf('expecting[Fixnum], got[%s]', executions.class)) unless executions.class.eql?(Fixnum)
@@ -98,19 +116,17 @@ class Bnchmrkr
   end
 
   # +type+ name of a lambda that is known
-  # +mode+ method to use on the Bnchmrkr::Mark object ot compare (:real, :cstime, :cutime, :stime, :utime, :total)
   # find and return the fastest Bnchrmrkr::Mark runtime per lambda of +type+
-  def fastest_by_type(type, mode = :real)
+  def fastest_by_type(type)
     return UNCOMPUTED unless @marks.has_key?(type)
-    @marks[type].fastest.__send__(mode)
+    @marks[type].fastest.__send__(@benchmark_method)
   end
 
   # +type+ name of a lambda that is known
-  # +mode+ method to use on the Bnchmrkr::Mark object ot compare (:real, :cstime, :cutime, :stime, :utime, :total)
   # find and return the slowest Bnchrmrkr::Mark runtime per lambda of +type+
-  def slowest_by_type(type, mode = :real)
+  def slowest_by_type(type)
     return UNCOMPUTED unless @marks.has_key?(type)
-    @marks[type].slowest.__send__(mode)
+    @marks[type].slowest.__send__(@benchmark_method)
   end
 
   # find and return the fastest overall execution (regardless of lambda type)
@@ -127,48 +143,48 @@ class Bnchmrkr
 
   # +a+ Symbol that represents a known lambda
   # +b+ Symbol that represents a known lambda
-  # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
-  def is_faster?(a, b, mode = :real)
+  def is_faster?(a, b)
     return false unless @marks.has_key?(a) and @marks.has_key?(b)
     # TODO not sure that we're doing the right thing here.. the fastest fast run should always be faster than the slowest slow run.. but should we be comparing fastest fast with slowest fast?
-    @marks[a].fastest.__send__(mode) < @marks[b].fastest.__send__(mode)
+    @marks[a].fastest.__send__(@benchmark_method) < @marks[b].fastest.__send__(@benchmark_method)
   end
 
   # +a+ Bnchmrkr::Mark
   # +b+ Bnchmrkr::Mark
   # +mode+ :fastest, :slowest, :mean, :median, :total
   # return boolean if a is faster than b, false if invalid
-  def is_slower?(a, b, mode = :real)
-    ! is_faster?(a, b, mode)
+  def is_slower?(a, b)
+    ! is_faster?(a, b)
   end
 
   # +a+ Bnchmrkr::Mark
   # +b+ Bnchmrkr::Mark
   # +percent+ Boolean representing percent (String) or Float difference
   # return Float representing difference in measures, or false, if b is slower than a
-  def faster_by_result(a, b, percent = true, mode = :real)
-    measure_a = a.__send__(mode)
-    measure_b = b.__send__(mode)
+  def faster_by_result(a, b, percent = true)
+    measure_a = a.__send__(@benchmark_method)
+    measure_b = b.__send__(@benchmark_method)
 
     return false if measure_b < measure_a
 
     faster = (measure_b - measure_a) / measure_a
-    percent ? sprintf('%4f%', faster * 100) : faster
+    # TODO need to fix this.. not sure where we have a good example of this, but.. we do have one
+    percent ? sprintf('%%df%', @precision, faster * 100) : faster
   end
 
   # +a+ Symbol representing name of known lambda type
   # +b+ Symbol representing name of known lambda type
   # +percent+ Boolean representing percent (String) or Float difference
   # return Float representing difference in measures, or false, if b is slower than a
-  def faster_by_type(a, b, percent = true, mode = :real)
-    fastest_a = fastest_by_type(a).__send__(mode)
-    fastest_b = fastest_by_type(b).__send__(mode)
+  def faster_by_type(a, b, percent = true)
+    fastest_a = fastest_by_type(a).__send__(@benchmark_method)
+    fastest_b = fastest_by_type(b).__send__(@benchmark_method)
 
     return false if fastest_b < fastest_a
 
     faster = (fastest_b - fastest_a) / fastest_a
-    percent ? sprintf('%4f%', faster * 100) : faster
+    percent ? sprintf('%%df%', @precision, faster * 100) : faster
   end
 
   def slower_by_type(a, b, percent = true)
@@ -182,25 +198,25 @@ class Bnchmrkr
   private
 
   # update fastest/slowest, return in a named Hash
-  def calculate_overall(mode = :real)
+  def calculate_overall()
 
     reset_computation
 
     @marks.each_pair do |_name, mark|
-      if @fastest.eql?(:uncomputed) or mark.fastest.__send__(mode) < @fastest.fastest.__send__(mode)
+      if @fastest.eql?(:uncomputed) or mark.fastest.__send__(@benchmark_method) < @fastest.fastest.__send__(@benchmark_method)
         @fastest = mark
       end
 
-      if @slowest.eql?(:uncomputed) or mark.slowest.__send__(mode) > @slowest.slowest.__send__(mode)
+      if @slowest.eql?(:uncomputed) or mark.slowest.__send__(@benchmark_method) > @slowest.slowest.__send__(@benchmark_method)
         @slowest = mark
       end
 
     end
 
     {
-      :fastest      => @fastest.fastest.__send__(mode),
+      :fastest      => @fastest.fastest.__send__(@benchmark_method),
       :fastest_name => @fastest.name,
-      :slowest      => @slowest.slowest.__send__(mode),
+      :slowest      => @slowest.slowest.__send__(@benchmark_method),
       :slowest_name => @slowest.name,
       :faster_by    => self.faster_by_result(@fastest.fastest, @slowest.slowest)
     }

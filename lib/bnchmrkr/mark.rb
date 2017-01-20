@@ -5,15 +5,18 @@ class Bnchmrkr; end
 class Bnchmrkr::Mark
   include Enumerable
 
-  attr_reader :computed, :lambda, :name, :mode_precision
+  attr_reader :config, :mode_precision, :precision
+  attr_reader :computed, :lambda, :name
   attr_reader :fastest, :slowest, :mean, :median, :mode, :total
 
-  def initialize(name, lambda, mode_precision = 0)
+  def initialize(name, lambda, config = {})
+    @config    = config
     @name      = name
     @lambda    = lambda # TODO this name is going to cause problems
     @measures  = Array.new
 
-    @mode_precision = mode_precision
+    @mode_precision = @config[:mode_precision] # specifically for mode calculation
+    @precision      = @config[:precision] # output and caching, really 'rounding'
 
     reset_computations # initialize to known values
   end
@@ -52,10 +55,10 @@ class Bnchmrkr::Mark
     sorted.collect { |r| total += r.real }
     @fastest = sorted.first
     @slowest = sorted.last
-    @mean    = sprintf('%5f', total / sorted.size).to_f
+    @mean    = sprintf('%%df', @precision, total / sorted.size).to_f
     @median  = sorted[(sorted.size / 2)]
     @mode    = mode
-    @total   = sprintf('%5f', total).to_f
+    @total   = sprintf('%%df', @precision, total).to_f
 
     @computed = true
   end
