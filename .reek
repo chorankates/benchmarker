@@ -58,6 +58,6 @@ UncommunicativeParameterName:
     - a
     - b
 
-# got dinged for using class variables.. how else would you use self.startup?
-exclude_paths:
-  - test/
+# got dinged for using class variables - what else would you use self.startup for?
+ClassVariable:
+  enabled: false
