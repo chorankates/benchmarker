@@ -1,6 +1,5 @@
 # bnchmrkr
-
-[![build status](https://travis-ci.org/chorankates/bnchmrkr.svg)](https://travis-ci.org/chorankates/bnchmrkr) [![Gem Version](https://badge.fury.io/rb/bnchmrkr.svg)](https://rubygems.org/gems/bnchmrkr) [![Code Climate](https://codeclimate.com/github/chorankates/bnchmrkr/badges/gpa.svg)](https://codeclimate.com/github/chorankates/bnchmrkr)
+[![build status](https://travis-ci.org/chorankates/bnchmrkr.svg?branch=master)](https://travis-ci.org/chorankates/bnchmrkr) [![Gem Version](https://badge.fury.io/rb/bnchmrkr.svg)](https://rubygems.org/gems/bnchmrkr) [![Code Climate](https://codeclimate.com/github/chorankates/bnchmrkr/badges/gpa.svg)](https://codeclimate.com/github/chorankates/bnchmrkr)
 
 Bnchmrkr (Benchmarker) is a tool to help benchmark different method implementations in Ruby
 
