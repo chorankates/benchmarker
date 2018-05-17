@@ -28,7 +28,7 @@ class Bnchmrkr
       @marks[name] = Bnchmrkr::Mark.new(name, l)
     end
 
-    raise ArgumentError.new(sprintf('expecting[Fixnum], got[%s]', executions.class)) unless executions.class.eql?(Fixnum)
+    raise ArgumentError.new(sprintf('expecting[Integer], got[%s]', executions.class)) unless executions.class.eql?(Integer)
 
   end
 
