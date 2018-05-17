@@ -42,6 +42,7 @@ GEM
       rdoc
     json (1.8.3)
     jwt (1.5.1)
+    log4r (1.1.10)
     mini_portile2 (2.0.0)
     multi_json (1.11.2)
     multi_xml (0.5.5)
@@ -86,6 +87,7 @@ PLATFORMS
 DEPENDENCIES
   codeclimate-test-reporter (~> 0.3)
   jeweler (~> 2.0.1, >= 2.0.1)
+  log4r (~> 1.1.10, >= 1.0.0)
   rake (~> 10.5.0, >= 10.5.0)
   reek (~> 3.11, >= 3.11)
   test-unit (~> 3.0.0, >= 3.0.0)
@@ -94,4 +96,4 @@ RUBY VERSION
    ruby 2.0.0p648
 
 BUNDLED WITH
-   1.12.5
+   1.13.6
